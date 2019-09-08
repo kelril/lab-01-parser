@@ -18,8 +18,7 @@ huntergate(
   SHA1 "70287b1ffa810ee4e952052a9adff9b4856d0d54"
 )
 
-# TODO: rename project and delete this comment
-project(template)
+project(Json)
 string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
