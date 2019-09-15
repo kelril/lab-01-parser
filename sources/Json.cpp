@@ -485,7 +485,7 @@ std::any return_object(std::stack <std::any>& temp_stack)
 
 std::string any_to_normal(std::any s)
 	{
-		if (!s.has_value())
+		if (s.type() == typeid(std::nullptr_t))
 			{
 				return "null";
 			}
