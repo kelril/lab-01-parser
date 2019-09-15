@@ -384,18 +384,14 @@ std::any return_object(std::stack <std::any>&);
 			{
 				return nullptr;
 			}
-
-		 if (s.size() == 5 && (s.front() == 'f' || s.front() == 't'))
-			{
-				 if (s.front() == 'f')
-					{
-						return false;
-					}
-				 if (s.front() == 't')
-					 {
-						 return true;
-					 }
-			}
+		 if (s.front() == 'f' && s.size() == 5)
+			 {
+				 return false;
+			 }
+		 if (s.front() == 't' && s.size() == 4)
+			 {
+				 return false;
+			 }
 		 if (s.front() > -1 && s.front() < 255)
 			 {
 				 if (isdigit(s.front() - '\0'))
