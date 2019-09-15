@@ -5,22 +5,11 @@
 
 int main()
 	{
+		Json b("{\"menu\": \"Файл\",\"commands\":[{\"title\":\"Новый\",\"action\":\"CreateDoc\"},{\"title\":\"Открыть\",\"action\":\"OpenDoc\"},{\"title\":\"Закрыть\",\"action\": \"CloseDoc\"}]}");
+		Json a("json.txt");
+		a.print();
+		b.print();
+		setlocale(LC_ALL, "ru-RU");
 		return 0;
 	}
 
-/* TODO : Удалить после конечного результата
-#include "Exceptions.h"
-int main()
-	{
-		try
-			{
-				throw JsonWarning("OPA GOP STOP");
-			}
-		catch (std::exception &exc)
-			{
-				std::cout << exc.what();
-			}
-
-		return 0;
-	}
-*/
