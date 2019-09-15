@@ -541,7 +541,7 @@ void Json::print()
 							}
 						else
 							{
-								std::cout <<"\""<< any_to_normal(i) << "\"" << std::endl;
+								std::cout <<"\""<< any_to_normal(*i) << "\"" << std::endl;
 							}
 					}
 				std::cout << "  ]\n\n";
