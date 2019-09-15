@@ -385,7 +385,7 @@ std::any return_object(std::stack <std::any>&);
 				return nullptr;
 			}
 
-		 if (s.size() == 4 && (s.front() == 'f' || s.front() == 't'))
+		 if (s.size() == 5 && (s.front() == 'f' || s.front() == 't'))
 			{
 				 if (s.front() == 'f')
 					{
