@@ -18,6 +18,5 @@ jobs:
     - name: "memory leaks"
       script:
         - docker run -t -v $(pwd):/opt/builder/ --entrypoint ./scripts/valgrind.sh darthbarada/bootstrap-cpp
-
 notifications:
   email: false
