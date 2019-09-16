@@ -5,6 +5,8 @@
 #include <any>
 #include <typeinfo>
 
+#include "Exceptions.hpp"
+
 class Json 
 	{
 		// Контейнеры для хранения объектов
