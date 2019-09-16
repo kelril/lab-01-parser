@@ -1,4 +1,3 @@
-#include "pch.h"
 #include  "Json.h"
 #include "Exceptions.h"
 
@@ -28,11 +27,11 @@ Json::~Json()
 
 bool is_file(const std::string& s)
 	{
-		bool buffer=false;			// Создаём левую переменную, чтобы конечное значение не исчезло
-		std::ifstream check(s);		// Открываем файл с названием s
-		buffer = check.is_open();	// Присваиваем значение
-		check.close();				// Закрываем файл
-		return buffer;				// Выводим значение
+		bool buffer=false;			// Г‘Г®Г§Г¤Г ВёГ¬ Г«ГҐГўГіГѕ ГЇГҐГ°ГҐГ¬ГҐГ­Г­ГіГѕ, Г·ГІГ®ГЎГ» ГЄГ®Г­ГҐГ·Г­Г®ГҐ Г§Г­Г Г·ГҐГ­ГЁГҐ Г­ГҐ ГЁГ±Г·ГҐГ§Г«Г®
+		std::ifstream check(s);		// ГЋГІГЄГ°Г»ГўГ ГҐГ¬ ГґГ Г©Г« Г± Г­Г Г§ГўГ Г­ГЁГҐГ¬ s
+		buffer = check.is_open();	// ГЏГ°ГЁГ±ГўГ ГЁГўГ ГҐГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ
+		check.close();				// Г‡Г ГЄГ°Г»ГўГ ГҐГ¬ ГґГ Г©Г«
+		return buffer;				// Г‚Г»ГўГ®Г¤ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ
 	}
 
 Json::Json(const std::string& s)
@@ -88,7 +87,7 @@ std::any return_object(std::stack <std::any>&);
 		std::string buffer;
 		
 		///
-		///---------------- В этом блоке мы парсим json строку в стек ----------------
+		///---------------- Г‚ ГЅГІГ®Г¬ ГЎГ«Г®ГЄГҐ Г¬Г» ГЇГ Г°Г±ГЁГ¬ json Г±ГІГ°Г®ГЄГі Гў Г±ГІГҐГЄ ----------------
 		///
 		if (s.front() != '{' || s.back() != '}')
 			{
@@ -108,7 +107,7 @@ std::any return_object(std::stack <std::any>&);
 
 								case ('\n'):break;
 
-								case (':'): // Сохраняем это как показатель наличия пары
+								case (':'): // Г‘Г®ГµГ°Г Г­ГїГҐГ¬ ГЅГІГ® ГЄГ ГЄ ГЇГ®ГЄГ Г§Г ГІГҐГ«Гј Г­Г Г«ГЁГ·ГЁГї ГЇГ Г°Г»
 									{
 										if (!buffer.empty())
 											{
@@ -206,7 +205,7 @@ std::any return_object(std::stack <std::any>&);
 					}
 			}
 		///
-		///------------------------------- Конец блока -------------------------------
+		///------------------------------- ГЉГ®Г­ГҐГ¶ ГЎГ«Г®ГЄГ  -------------------------------
 		///
 		while (!temp_stack.empty())
 			{
@@ -227,7 +226,7 @@ std::any return_object(std::stack <std::any>&);
 
 		setlocale(LC_ALL, "ru-RU");
 
-		if (!file.is_open()) // если файл не открыт
+		if (!file.is_open()) // ГҐГ±Г«ГЁ ГґГ Г©Г« Г­ГҐ Г®ГІГЄГ°Г»ГІ
 			throw JsonWarning("Path has errors!");
 		else
 			{
@@ -240,7 +239,7 @@ std::any return_object(std::stack <std::any>&);
 			}
 		file.close();
 		///
-		///------------------------------- Начало блока -------------------------------
+		///------------------------------- ГЌГ Г·Г Г«Г® ГЎГ«Г®ГЄГ  -------------------------------
 		///
 		if (buffer_line.front() != '{' || buffer_line.back() != '}')
 			{
@@ -260,7 +259,7 @@ std::any return_object(std::stack <std::any>&);
 
 								case ('\n'):break;
 
-								case (':'): // Сохраняем это как показатель наличия пары
+								case (':'): // Г‘Г®ГµГ°Г Г­ГїГҐГ¬ ГЅГІГ® ГЄГ ГЄ ГЇГ®ГЄГ Г§Г ГІГҐГ«Гј Г­Г Г«ГЁГ·ГЁГї ГЇГ Г°Г»
 									{
 										if (!buffer.empty())
 											{
@@ -358,7 +357,7 @@ std::any return_object(std::stack <std::any>&);
 					}
 			}
 		///
-		///------------------------------- Конец блока -------------------------------
+		///------------------------------- ГЉГ®Г­ГҐГ¶ ГЎГ«Г®ГЄГ  -------------------------------
 		///
 			while (!temp_stack.empty())
 				{
@@ -408,10 +407,10 @@ std::any return_object(std::stack <std::any>&);
 
 std::any return_object(std::stack <std::any>& temp_stack)
 	{	
-		// Входящий стек имеет значения:(значение->":"->ключ,значение->":"->ключ,значение->":"->ключ ...) 
-		// Или (значение->значение->значение->значение...)
+		// Г‚ГµГ®Г¤ГїГ№ГЁГ© Г±ГІГҐГЄ ГЁГ¬ГҐГҐГІ Г§Г­Г Г·ГҐГ­ГЁГї:(Г§Г­Г Г·ГҐГ­ГЁГҐ->":"->ГЄГ«ГѕГ·,Г§Г­Г Г·ГҐГ­ГЁГҐ->":"->ГЄГ«ГѕГ·,Г§Г­Г Г·ГҐГ­ГЁГҐ->":"->ГЄГ«ГѕГ· ...) 
+		// Г€Г«ГЁ (Г§Г­Г Г·ГҐГ­ГЁГҐ->Г§Г­Г Г·ГҐГ­ГЁГҐ->Г§Г­Г Г·ГҐГ­ГЁГҐ->Г§Г­Г Г·ГҐГ­ГЁГҐ...)
 		Json *j = new Json;
-		if (temp_stack.top().type() == typeid(Json *)) // Если стек состоит из Json объектов, то это массив
+		if (temp_stack.top().type() == typeid(Json *)) // Г…Г±Г«ГЁ Г±ГІГҐГЄ Г±Г®Г±ГІГ®ГЁГІ ГЁГ§ Json Г®ГЎГєГҐГЄГІГ®Гў, ГІГ® ГЅГІГ® Г¬Г Г±Г±ГЁГў
 			{	
 				Json *temp;
 				while (!temp_stack.empty())
@@ -423,11 +422,11 @@ std::any return_object(std::stack <std::any>& temp_stack)
 					}
 				return j;
 			}
-		if (temp_stack.top().type() == typeid(std::string)) // Если стек состоит из std::string объектов, то это обЪект или массив
+		if (temp_stack.top().type() == typeid(std::string)) // Г…Г±Г«ГЁ Г±ГІГҐГЄ Г±Г®Г±ГІГ®ГЁГІ ГЁГ§ std::string Г®ГЎГєГҐГЄГІГ®Гў, ГІГ® ГЅГІГ® Г®ГЎГљГҐГЄГІ ГЁГ«ГЁ Г¬Г Г±Г±ГЁГў
 			{
 				std::string buffer=std::any_cast<std::string>(temp_stack.top());
 				temp_stack.pop();
-				if (std::any_cast<std::string>(temp_stack.top()) != ":") // Если нет разделителя, значит это массив
+				if (std::any_cast<std::string>(temp_stack.top()) != ":") // Г…Г±Г«ГЁ Г­ГҐГІ Г°Г Г§Г¤ГҐГ«ГЁГІГҐГ«Гї, Г§Г­Г Г·ГЁГІ ГЅГІГ® Г¬Г Г±Г±ГЁГў
 					{
 						j->AddArray(return_data(buffer));
 						buffer.clear();
@@ -437,7 +436,7 @@ std::any return_object(std::stack <std::any>& temp_stack)
 								temp_stack.pop();
 							}
 					}
-				else // Если есть разделители, значит это объекты
+				else // Г…Г±Г«ГЁ ГҐГ±ГІГј Г°Г Г§Г¤ГҐГ«ГЁГІГҐГ«ГЁ, Г§Г­Г Г·ГЁГІ ГЅГІГ® Г®ГЎГєГҐГЄГІГ»
 					{
 					std::pair<std::string, std::any> *temp_pair = new std::pair<std::string, std::any>;
 					temp_pair->first = buffer;
@@ -445,7 +444,7 @@ std::any return_object(std::stack <std::any>& temp_stack)
 					temp_stack.pop();
 					while (!temp_stack.empty())
 						{
-							if (std::any_cast<std::string>(temp_stack.top()) == ":") // Игнорируем ":"
+							if (std::any_cast<std::string>(temp_stack.top()) == ":") // Г€ГЈГ­Г®Г°ГЁГ°ГіГҐГ¬ ":"
 								{
 									temp_stack.pop();
 								}
@@ -455,13 +454,13 @@ std::any return_object(std::stack <std::any>& temp_stack)
 									temp_pair = new std::pair<std::string, std::any>;
 									temp_pair->first = std::any_cast<std::string>(temp_stack.top());
 								}
-							else if (!temp_pair->first.empty()) // Перестраховка
+							else if (!temp_pair->first.empty()) // ГЏГҐГ°ГҐГ±ГІГ°Г ГµГ®ГўГЄГ 
 								{
-									if (temp_stack.top().type() == typeid(std::string))//Если это стинговая строк, то 
+									if (temp_stack.top().type() == typeid(std::string))//Г…Г±Г«ГЁ ГЅГІГ® Г±ГІГЁГ­ГЈГ®ГўГ Гї Г±ГІГ°Г®ГЄ, ГІГ® 
 										{
 											temp_pair->second = return_data(std::any_cast<std::string>(temp_stack.top()));
 										}
-									else // Если это остальные типы, то
+									else // Г…Г±Г«ГЁ ГЅГІГ® Г®Г±ГІГ Г«ГјГ­Г»ГҐ ГІГЁГЇГ», ГІГ®
 										{
 											temp_pair->second = temp_stack.top();
 										}
