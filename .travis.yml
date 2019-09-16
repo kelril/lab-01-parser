@@ -1,23 +1,26 @@
 os: linux
 sudo: required
-language: "minimal"
+language:"minimal"
 services:
-  - docker
-  
+- docker
+
 jobs:
   include:
-    - name: "tests"
-      script:
-        - docker run -t -v $(pwd):/opt/builder/ --entrypoint ./scripts/tests.sh darthbarada/bootstrap-cpp
-    - name: "coverage"
-      script:
-        - docker run -t -v $(pwd):/opt/builder/ --entrypoint ./scripts/coverage.sh darthbarada/bootstrap-cpp
-    - name: "quality"
-      script:
-        - docker run -t -v $(pwd):/opt/builder/ --entrypoint ./scripts/duplication.sh darthbarada/bootstrap-cpp
-    - name: "memory leaks"
-      script:
-        - docker run -t -v $(pwd):/opt/builder/ --entrypoint ./scripts/valgrind.sh darthbarada/bootstrap-cpp
+  - name: "checks"
+    script:
+    - docker run -v `pwd`:`pwd` -w `pwd` --cap-add=SYS_PTRACE -t rusdevops/bootstrap-cpp scripts/checks.sh
+  - name: "tests"
+    script:
+    - docker run -v `pwd`:`pwd` -w `pwd` -t rusdevops/bootstrap-cpp scripts/tests.sh
+  - name: "quality"
+    script:
+    - ./scripts/genenv.sh
+    - docker run --env-file .env -v `pwd`:`pwd` -w `pwd` -t rusdevops/bootstrap-cpp scripts/coverage.sh
+    - docker run --env-file .env -v `pwd`:`pwd` -w `pwd` -t rusdevops/bootstrap-cpp scripts/duplication.sh
 
 notifications:
-  email: false
+    email: false
+
+branches:
+  except:
+  - master
