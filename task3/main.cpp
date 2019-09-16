@@ -23,7 +23,7 @@ int main()
 	{
 		auto fileInfo = hello();
 
-		// Проверка файла
+		// РџСЂРѕРІРµСЂРєР° С„Р°Р№Р»Р°
 		std::ifstream input(fileInfo.first);
 		if (!input.open()) 
 			{
@@ -34,7 +34,7 @@ int main()
 		nlohmann::json json;
 		input >> json;
 
-		// Проверка
+		// РџСЂРѕРІРµСЂРєР°
 		if (!json.is_array()) 
 			{
 				throw std::runtime_error( "Input JSON is not an array!");
@@ -51,7 +51,7 @@ int main()
 				return 1;
 			}
 
-		// Процесс переформирования
+		// РџСЂРѕС†РµСЃСЃ РїРµСЂРµС„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ
 		nlohmann::json outputJson;
 		for (size_t i = 0; i < json[0].size(); i++) 
 			{
@@ -65,7 +65,7 @@ int main()
 				);
 			}
 
-		// Подготовка выходного файла
+		// РџРѕРґРіРѕС‚РѕРІРєР° РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 		std::ofstream output(fileInfo.second);
 		if (!output.open())
 			{
@@ -73,7 +73,7 @@ int main()
 				return 1;
 			}
 
-		// Вывод
+		// Р’С‹РІРѕРґ
 		output << std::setw(4) << outputJson << std::endl;
 		return 0;
 }
