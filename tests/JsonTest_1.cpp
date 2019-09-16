@@ -13,21 +13,7 @@ TEST(Json, NullJson)
 
 TEST(Json, ExampleJson)
 	{
-		Json object(R"(
-			{
-				"lastname" : "Ivanov",
-				"firstname" : "Ivan",
-				"age" : 25,
-				"islegal" : false,
-				"marks" : [
-					4,5,5,5,2,3
-				],
-				"address" : {
-					"city" : "Moscow",
-					"street" : "Vozdvijenka"
-				}
-			}
-		)");
+		Json object("{\"lastname\" : \"Ivanov\",\"firstname\" : \"Ivan\",\"age\" : 25,\"islegal\" : false,\"marks\" : [4,5,5,5,2,3],\"address\" : {\"city\" : \"Moscow\",\"street\" : \"Vozdvijenka\"}}");
 
 		EXPECT_EQ(std::any_cast<std::string>(object["lastname"]), "Ivanov");
 		EXPECT_EQ(std::any_cast<bool>(object["islegal"]), false);
