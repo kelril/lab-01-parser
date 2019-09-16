@@ -7,12 +7,12 @@ TEST(JsonObject, EmptyObject)
 		Json json{"{}"};
 		EXPECT_EQ(json.is_object(), false);
 		EXPECT_EQ(json.is_array(), false);
-		EXPECT_EQ(json.is_empty(), false);
+		EXPECT_EQ(json.is_empty(), true);
 	}
 
 TEST(JsonObject, SimpleObject)
 	{
-		Json json{R"({ "key" : "value" })"};
+		Json json{"{ \"key\" : \"value\" }"};
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
@@ -22,7 +22,7 @@ TEST(JsonObject, SimpleObject)
 
 TEST(JsonObject, ObjectInsideObject)
 	{
-		Json json{R"({ "key" : { "number":   9.5 } })"};
+		Json json{"{ \"key\" : { \"number\":   9.5 } }"};
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
@@ -37,7 +37,7 @@ TEST(JsonObject, ObjectInsideObject)
 
 TEST(JsonObject, ObjectdWithArray)
 	{
-		Json json{R"({ "key" : [1,2,3] })"};
+		Json json{"{ \"key\" : [1,2,3] }"};
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
