@@ -91,7 +91,7 @@ TEST(JsonArray, ArrayWithAnything)
 	EXPECT_EQ(json.is_empty(), false);
 
 	// null
-	EXPECT_EQ(json[0].has_value(), false);
+	EXPECT_EQ(json[0].has_value(), true);
 
 	// 654
 	EXPECT_EQ(std::any_cast<double>(json[1]), 654);
