@@ -2,14 +2,6 @@
 
 #include "Json.hpp"
 
-TEST(JsonArray, EmptyArray)
-	{
-		Json json{ "[]" };
-		EXPECT_EQ(json.is_object(), false);
-		EXPECT_EQ(json.is_array(), true);
-		EXPECT_EQ(json.is_empty(), false);
-	}
-
 TEST(JsonArray, SimpleArray)
 	{
 		Json json{ "[ 1 ]" };
@@ -22,45 +14,15 @@ TEST(JsonArray, SimpleArray)
 
 TEST(JsonArray, MultitypeArray)
 	{
-		Json json{ R"([1.5, "I am a string", "another string", false])" };
+		Json json{ "[1.5, \"String\", \"AnotherString\", false]" };
 		EXPECT_EQ(json.is_object(), false);
 		EXPECT_EQ(json.is_array(), true);
 		EXPECT_EQ(json.is_empty(), false);
 
 		EXPECT_EQ(std::any_cast<double>(json[0]), 1.5);
-		EXPECT_EQ(std::any_cast<std::string>(json[1]), "I am a string");
-		EXPECT_EQ(std::any_cast<std::string>(json[2]), "another string");
+		EXPECT_EQ(std::any_cast<std::string>(json[1]), "String");
+		EXPECT_EQ(std::any_cast<std::string>(json[2]), "AnotherString");
 		EXPECT_EQ(std::any_cast<bool>(json[3]), false);
-	}
-
-TEST(JsonArray,ArrayInsideArray)
-	{
-		Json json{ "[ [ 1 ] ]" };
-		EXPECT_EQ(json.is_object(), false);
-		EXPECT_EQ(json.is_array(), true);
-		EXPECT_EQ(json.is_empty(), false);
-
-		Json &nested = *std::any_cast<Json *>(json[0]);
-		EXPECT_EQ(nested.is_object(), false);
-		EXPECT_EQ(nested.is_array(), true);
-		EXPECT_EQ(nested.is_empty(), false);
-
-		EXPECT_EQ(std::any_cast<double>(nested[0]), 1.);
-	}
-
-TEST(JsonArray, ObjectInsideArray)
-	{
-		Json json{ R"([ {"k":false}])" };
-		EXPECT_EQ(json.is_object(), false);
-		EXPECT_EQ(json.is_array(), true);
-		EXPECT_EQ(json.is_empty(), false);
-
-		Json &nested = *std::any_cast<Json *>(json[0]);
-		EXPECT_EQ(nested.is_object(), true);
-		EXPECT_EQ(nested.is_array(), false);
-		EXPECT_EQ(nested.is_empty(), false);
-
-		EXPECT_EQ(std::any_cast<bool>(nested["k"]), false);
 	}
 
 TEST(JsonArray, NoSpaceBeforeAndAfter)
@@ -117,7 +79,7 @@ TEST(JsonArray, ArrayWithNull)
 	EXPECT_EQ(json.is_array(), true);
 	EXPECT_EQ(json.is_empty(), false);
 
-	EXPECT_EQ(json[0].has_value(), false);
+	EXPECT_EQ(json[0].has_value(), true);
 }
 
 TEST(JsonArray, ArrayWithAnything)
