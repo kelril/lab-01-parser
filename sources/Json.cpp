@@ -86,7 +86,6 @@ std::any return_object(std::stack <std::any>&);
 		std::stack <std::any> temp_stack;
 		std::stack <std::any> buffer_stack;
 		std::string buffer;
-		
 		///
 		///---------------- В этом блоке мы парсим json строку в стек ----------------
 		///
@@ -407,6 +406,10 @@ std::any return_object(std::stack <std::any>& temp_stack)
 		// Входящий стек имеет значения:(значение->":"->ключ,значение->":"->ключ,значение->":"->ключ ...) 
 		// Или (значение->значение->значение->значение...)
 		Json *j = new Json;
+		if (temp_stack.empty())
+			{
+				return j;
+			}
 		if (temp_stack.top().type() == typeid(Json *)) // Если стек состоит из Json объектов, то это массив
 			{	
 				Json *temp;
