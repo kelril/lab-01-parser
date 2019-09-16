@@ -26,11 +26,11 @@ Json::~Json()
 
 bool is_file(const std::string& s)
 	{
-		bool buffer=false;			// Ñîçäà¸ì ëåâóþ ïåðåìåííóþ, ÷òîáû êîíå÷íîå çíà÷åíèå íå èñ÷åçëî
-		std::ifstream check(s);		// Îòêðûâàåì ôàéë ñ íàçâàíèåì s
-		buffer = check.is_open();	// Ïðèñâàèâàåì çíà÷åíèå
-		check.close();				// Çàêðûâàåì ôàéë
-		return buffer;				// Âûâîäèì çíà÷åíèå
+		bool buffer=false;			// Создаём левую переменную, чтобы конечное значение не исчезло
+		std::ifstream check(s);		// Открываем файл с названием s
+		buffer = check.is_open();	// Присваиваем значение
+		check.close();				// Закрываем файл
+		return buffer;				// Выводим значение
 	}
 
 Json::Json(const std::string& s)
@@ -84,17 +84,16 @@ std::any return_object(std::stack <std::any>&);
 		std::stack <std::any> temp_stack;
 		std::stack <std::any> buffer_stack;
 		std::string buffer;
-		
 		///
-		///---------------- Â ýòîì áëîêå ìû ïàðñèì json ñòðîêó â ñòåê ----------------
+		///---------------- В этом блоке мы парсим json строку в стек ----------------
 		///
-		if (s.front() != '{' || s.back() != '}')
+		if ((s.front() != '{' && s.front() != '[') || (s.back() != '}' && s.back() != ']'))
 			{
 				throw WrongJson("Wrong format of .json file!");
 			}
 		else
 			{
-				for (int i = 1; i+1 < int(s.size()); i++)
+				for (int i = 0; i < int(s.size()); i++)
 					{
 						switch (s.at(i))
 							{
@@ -106,7 +105,7 @@ std::any return_object(std::stack <std::any>&);
 
 								case ('\n'):break;
 
-								case (':'): // Ñîõðàíÿåì ýòî êàê ïîêàçàòåëü íàëè÷èÿ ïàðû
+								case (':'): // Сохраняем это как показатель наличия пары
 									{
 										if (!buffer.empty())
 											{
@@ -142,9 +141,9 @@ std::any return_object(std::stack <std::any>&);
 								case ('['):
 									{
 										if (!buffer.empty())
-										{
-											temp_stack.push(buffer);
-										}
+											{
+												temp_stack.push(buffer);
+											}
 										buffer = s.at(i);
 										temp_stack.push(buffer);
 										buffer.clear();
@@ -204,7 +203,7 @@ std::any return_object(std::stack <std::any>&);
 					}
 			}
 		///
-		///------------------------------- Êîíåö áëîêà -------------------------------
+		///------------------------------- Конец блока -------------------------------
 		///
 		while (!temp_stack.empty())
 			{
@@ -225,8 +224,8 @@ std::any return_object(std::stack <std::any>&);
 
 		setlocale(LC_ALL, "ru-RU");
 
-		if (!file.is_open()) // åñëè ôàéë íå îòêðûò
-			throw JsonWarning("Path has errors!");
+		if (!file.is_open()) // если файл не открыт
+			throw WrongJson("Path has errors!");
 		else
 			{
 				while (!file.eof())
@@ -238,7 +237,7 @@ std::any return_object(std::stack <std::any>&);
 			}
 		file.close();
 		///
-		///------------------------------- Íà÷àëî áëîêà -------------------------------
+		///------------------------------- Начало блока -------------------------------
 		///
 		if (buffer_line.front() != '{' || buffer_line.back() != '}')
 			{
@@ -258,7 +257,7 @@ std::any return_object(std::stack <std::any>&);
 
 								case ('\n'):break;
 
-								case (':'): // Ñîõðàíÿåì ýòî êàê ïîêàçàòåëü íàëè÷èÿ ïàðû
+								case (':'): // Сохраняем это как показатель наличия пары
 									{
 										if (!buffer.empty())
 											{
@@ -356,7 +355,7 @@ std::any return_object(std::stack <std::any>&);
 					}
 			}
 		///
-		///------------------------------- Êîíåö áëîêà -------------------------------
+		///------------------------------- Конец блока -------------------------------
 		///
 			while (!temp_stack.empty())
 				{
@@ -382,19 +381,15 @@ std::any return_object(std::stack <std::any>&);
 			{
 				return nullptr;
 			}
-
-		 if (s.size() == 4 && (s.front() == 'f' || s.front() == 't'))
-			{
-				 if (s.front() == 'f')
-					{
-						return false;
-					}
-				 if (s.front() == 't')
-					 {
-						 return true;
-					 }
-			}
-		 if (int(s.front()) > 47 && int(s.front()) < 58)
+		 if (s.front() == 'f' && s.size() == 5)
+			 {
+				 return false;
+			 }
+		 if (s.front() == 't' && s.size() == 4)
+			 {
+				 return false;
+			 }
+		 if (s.front() > -1 && s.front() < 255)
 			 {
 				 if (isdigit(s.front() - '\0'))
 					 {
@@ -406,26 +401,38 @@ std::any return_object(std::stack <std::any>&);
 
 std::any return_object(std::stack <std::any>& temp_stack)
 	{	
-		// Âõîäÿùèé ñòåê èìååò çíà÷åíèÿ:(çíà÷åíèå->":"->êëþ÷,çíà÷åíèå->":"->êëþ÷,çíà÷åíèå->":"->êëþ÷ ...) 
-		// Èëè (çíà÷åíèå->çíà÷åíèå->çíà÷åíèå->çíà÷åíèå...)
+		// Входящий стек имеет значения:(значение->":"->ключ,значение->":"->ключ,значение->":"->ключ ...) 
+		// Или (значение->значение->значение->значение...)
 		Json *j = new Json;
-		if (temp_stack.top().type() == typeid(Json *)) // Åñëè ñòåê ñîñòîèò èç Json îáúåêòîâ, òî ýòî ìàññèâ
-			{	
-				Json *temp;
-				while (!temp_stack.empty())
-					{
-						temp = new Json;
-						temp->copy_json(*std::any_cast<Json *>(temp_stack.top()));
-						j->AddArray(temp);
-						temp_stack.pop();
-					}
+		if (temp_stack.empty())
+			{
 				return j;
 			}
-		if (temp_stack.top().type() == typeid(std::string)) // Åñëè ñòåê ñîñòîèò èç std::string îáúåêòîâ, òî ýòî îáÚåêò èëè ìàññèâ
+		if (temp_stack.top().type() == typeid(Json *)) // Если стек состоит из Json объектов, то это массив
+			{	
+				if (temp_stack.size() > 1)
+					{
+						Json *temp;
+						while (!temp_stack.empty())
+							{
+								temp = new Json;
+								temp->copy_json(*std::any_cast<Json *>(temp_stack.top()));
+								j->AddArray(temp);
+								temp_stack.pop();
+							}
+					}
+				else
+					{
+						j->copy_json(*std::any_cast<Json *>(temp_stack.top()));
+						temp_stack.pop();
+					}
+					return j;
+			}
+		if (temp_stack.top().type() == typeid(std::string)) // Если стек состоит из std::string объектов, то это обЪект или массив
 			{
 				std::string buffer=std::any_cast<std::string>(temp_stack.top());
 				temp_stack.pop();
-				if (std::any_cast<std::string>(temp_stack.top()) != ":") // Åñëè íåò ðàçäåëèòåëÿ, çíà÷èò ýòî ìàññèâ
+				if (temp_stack.empty() || std::any_cast<std::string>(temp_stack.top()) != ":") // Если нет разделителя, значит это массив
 					{
 						j->AddArray(return_data(buffer));
 						buffer.clear();
@@ -435,7 +442,7 @@ std::any return_object(std::stack <std::any>& temp_stack)
 								temp_stack.pop();
 							}
 					}
-				else // Åñëè åñòü ðàçäåëèòåëè, çíà÷èò ýòî îáúåêòû
+				else // Если есть разделители, значит это объекты
 					{
 					std::pair<std::string, std::any> *temp_pair = new std::pair<std::string, std::any>;
 					temp_pair->first = buffer;
@@ -443,23 +450,27 @@ std::any return_object(std::stack <std::any>& temp_stack)
 					temp_stack.pop();
 					while (!temp_stack.empty())
 						{
-							if (std::any_cast<std::string>(temp_stack.top()) == ":") // Èãíîðèðóåì ":"
+							if (temp_stack.top().type() == typeid(std::string))
 								{
-									temp_stack.pop();
+									if (std::any_cast<std::string>(temp_stack.top()) == ":") // Игнорируем ":"
+										{
+											temp_stack.pop();
+										}
 								}
+							
 
 							if (temp_pair->first.empty())
 								{
 									temp_pair = new std::pair<std::string, std::any>;
 									temp_pair->first = std::any_cast<std::string>(temp_stack.top());
 								}
-							else if (!temp_pair->first.empty()) // Ïåðåñòðàõîâêà
+							else if (!temp_pair->first.empty()) // Перестраховка
 								{
-									if (temp_stack.top().type() == typeid(std::string))//Åñëè ýòî ñòèíãîâàÿ ñòðîê, òî 
+									if (temp_stack.top().type() == typeid(std::string))//Если это стинговая строк, то 
 										{
 											temp_pair->second = return_data(std::any_cast<std::string>(temp_stack.top()));
 										}
-									else // Åñëè ýòî îñòàëüíûå òèïû, òî
+									else // Если это остальные типы, то
 										{
 											temp_pair->second = temp_stack.top();
 										}
@@ -483,7 +494,7 @@ std::any return_object(std::stack <std::any>& temp_stack)
 
 std::string any_to_normal(std::any s)
 	{
-		if (!s.has_value())
+		if (s.type() == typeid(std::nullptr_t))
 			{
 				return "null";
 			}
@@ -539,7 +550,7 @@ void Json::print()
 							}
 						else
 							{
-								std::cout <<"\""<< any_to_normal(i) << "\"" << std::endl;
+								std::cout <<"\""<< any_to_normal(*i) << "\"" << std::endl;
 							}
 					}
 				std::cout << "  ]\n\n";
