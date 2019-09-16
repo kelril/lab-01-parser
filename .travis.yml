@@ -4,9 +4,6 @@ language: "minimal"
 services:
   - docker
   
-before_script:
-  - docker pull toliak/bootstrap-cpp
-
 jobs:
   include:
     - name: "tests"
