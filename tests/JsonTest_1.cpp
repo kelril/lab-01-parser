@@ -2,7 +2,7 @@
 #include <fstream>
 
 #include "Json.hpp"
-// Ïðîâåðêà íà ïóñòîé îáúåêò
+
 TEST(Json, NullJson)
 	{
 		Json json{};
