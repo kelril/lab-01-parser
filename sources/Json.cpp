@@ -94,7 +94,7 @@ std::any return_object(std::stack <std::any>&);
 			}
 		else
 			{
-				for (int i = 1; i+1 < int(s.size()); i++)
+				for (int i = 0; i < int(s.size()); i++)
 					{
 						switch (s.at(i))
 							{
@@ -142,9 +142,9 @@ std::any return_object(std::stack <std::any>&);
 								case ('['):
 									{
 										if (!buffer.empty())
-										{
-											temp_stack.push(buffer);
-										}
+											{
+												temp_stack.push(buffer);
+											}
 										buffer = s.at(i);
 										temp_stack.push(buffer);
 										buffer.clear();
@@ -411,21 +411,29 @@ std::any return_object(std::stack <std::any>& temp_stack)
 			}
 		if (temp_stack.top().type() == typeid(Json *)) // Если стек состоит из Json объектов, то это массив
 			{	
-				Json *temp;
-				while (!temp_stack.empty())
+				if (temp_stack.size() > 1)
 					{
-						temp = new Json;
-						temp->copy_json(*std::any_cast<Json *>(temp_stack.top()));
-						j->AddArray(temp);
+						Json *temp;
+						while (!temp_stack.empty())
+							{
+								temp = new Json;
+								temp->copy_json(*std::any_cast<Json *>(temp_stack.top()));
+								j->AddArray(temp);
+								temp_stack.pop();
+							}
+					}
+				else
+					{
+						j->copy_json(*std::any_cast<Json *>(temp_stack.top()));
 						temp_stack.pop();
 					}
-				return j;
+					return j;
 			}
 		if (temp_stack.top().type() == typeid(std::string)) // Если стек состоит из std::string объектов, то это обЪект или массив
 			{
 				std::string buffer=std::any_cast<std::string>(temp_stack.top());
 				temp_stack.pop();
-				if (std::any_cast<std::string>(temp_stack.top()) != ":") // Если нет разделителя, значит это массив
+				if (temp_stack.empty() || std::any_cast<std::string>(temp_stack.top()) != ":") // Если нет разделителя, значит это массив
 					{
 						j->AddArray(return_data(buffer));
 						buffer.clear();
