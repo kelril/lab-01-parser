@@ -387,7 +387,7 @@ std::any return_object(std::stack <std::any>&);
 			 }
 		 if (s.front() == 't' && s.size() == 4)
 			 {
-				 return false;
+				 return true;
 			 }
 		 if (int(s.front()) > 47 && int(s.front()) < 58)
 			 {
