@@ -5,7 +5,7 @@
 TEST(JsonObject, EmptyObject)
 	{
 		Json json{"{}"};
-		EXPECT_EQ(json.is_object(), true);
+		EXPECT_EQ(json.is_object(), false);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
 	}
@@ -52,7 +52,7 @@ TEST(JsonObject, ObjectdWithArray)
 
 TEST(JsonObject, ObjectsWithArrayAndValues)
 	{
-		Json json{R"({ "key" : [1,2,3], "key2": true })"};
+		Json json{"{ \"key\" : [1,2,3], \"key2\": true }"};
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
@@ -72,7 +72,7 @@ TEST(JsonObject, ObjectsWithArrayAndValues)
 TEST(JsonObject, CharAfterEndException)
 	{
 		EXPECT_THROW(
-			Json{R"({},)"},
+			Json{"{},"},
 			WrongJson
 		);
 	}
