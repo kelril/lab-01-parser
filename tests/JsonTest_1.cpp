@@ -13,7 +13,7 @@ TEST(Json, NullJson)
 
 TEST(Json, ExampleJson)
 	{
-		Json object = Json::parse(R"(
+		Json object(R"(
 			{
 				"lastname" : "Ivanov",
 				"firstname" : "Ivan",
@@ -44,13 +44,13 @@ TEST(Json, ExampleJson)
 
 TEST(Json, ParseFile)
 	{
-		auto json = Json::parseFile("../tests/TestJson.json");
+		Json json("../tests/TestJson.json");
 
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
 	}
-// Ïðîâåðêà íà íåïðàâèëüíûé ïóòü
+
 TEST(Json, ParseFileException)
 	{
 		EXPECT_THROW(
@@ -58,7 +58,7 @@ TEST(Json, ParseFileException)
 			WrongJson
 		);
 	}
-// Ïðîâåðêà íà äîáàâëåíèå îáúåêòà
+
 TEST(Json, AddObject)
 	{
 		Json json{ "{}" };
@@ -66,7 +66,7 @@ TEST(Json, AddObject)
 
 		EXPECT_EQ(std::any_cast<std::string>(json["key"]), "value");
 	}
-// Ïðîâåðêà íà ïóñòûå îáúåêòû
+
 TEST(Json, OperatorArrayTypeException)
 	{
 		Json json{ "[]" };
@@ -76,7 +76,7 @@ TEST(Json, OperatorArrayTypeException)
 			JsonNoContainer
 		);
 	}
-// Ïðîâåðêà íà ïóñòûå îáúåêòû
+
 TEST(Json, OperatorObjectTypeException)
 	{
 		Json json{ "{}" };
@@ -86,7 +86,7 @@ TEST(Json, OperatorObjectTypeException)
 			JsonNoContainer
 		);
 	}
-// Ïðîâåðêà íà ïóñòîé ìàññèâ
+
 TEST(Json, OperatorArrayExceptionSize)
 	{
 		Json json{ "[]" };
@@ -96,7 +96,7 @@ TEST(Json, OperatorArrayExceptionSize)
 			JsonNoContainer
 		);
 	}
-// Ïðîâåðêà íà íåïðàâèëüíûé ââîä êëþ÷à
+
 TEST(Json, OperatorObjectTypeExceptionNoKey)
 	{
 		Json json{ "{'key':1}" };
@@ -106,7 +106,7 @@ TEST(Json, OperatorObjectTypeExceptionNoKey)
 			JsonWrongKey
 		);
 	}
-// Ïðîâåðêà íà íåïðàâèëüíûé ââîä json ñòðîêè
+
 TEST(Json, NoJson)
 	{
 		EXPECT_THROW(
