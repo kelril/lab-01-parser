@@ -38,7 +38,7 @@ TEST(JsonArray, NoSpaceBeforeAndAfter)
 
 TEST(JsonArray, ArrayWithObjects)
 	{
-		Json json{ R"([{"a": "b"}, {"b": true}, {"test": 123}])" };
+		Json json{ "[{\"a\": \"b\"}, {\"b\": true}, {\"test\": 123}]" };
 
 		EXPECT_EQ(json.is_object(), false);
 		EXPECT_EQ(json.is_array(), true);
