@@ -391,10 +391,7 @@ std::any return_object(std::stack <std::any>&);
 			 }
 		 if (int(s.front()) > 47 && int(s.front()) < 58)
 			 {
-				 if (isdigit(s.front() - '\0'))
-					 {
-						 return std::stod(s);
-					 }
+				return std::stod(s);
 			 }
 		 return s;
 	 }
@@ -438,7 +435,7 @@ std::any return_object(std::stack <std::any>& temp_stack)
 						buffer.clear();
 						while (!temp_stack.empty())
 							{
-								j->AddArray(temp_stack.top());
+								j->AddArray(return_data(std::any_cast<std::string>(temp_stack.top())));
 								temp_stack.pop();
 							}
 					}
