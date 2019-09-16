@@ -435,7 +435,15 @@ std::any return_object(std::stack <std::any>& temp_stack)
 						buffer.clear();
 						while (!temp_stack.empty())
 							{
-								j->AddArray(return_data(std::any_cast<std::string>(temp_stack.top())));
+								if (temp_stack.top().type() != typeid(std::string))
+									{
+										j->AddArray(temp_stack.top());
+									}
+								else
+									{
+										j->AddArray(return_data(std::any_cast<std::string>(temp_stack.top())));
+									}
+								
 								temp_stack.pop();
 							}
 					}
