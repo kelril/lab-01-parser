@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/DarthBarada/lab-01-parser.svg?branch=master)
+![Build Status](https://travis-ci.org/DarthBarada/lab-01-parser.svg?branch=master)
 # Задание 1
 Реализовать парсер данных в формате JSON.
 
