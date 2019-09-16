@@ -51,13 +51,11 @@ TEST(JsonArray,ArrayInsideArray)
 TEST(JsonArray, ObjectInsideArray)
 	{
 		Json json{ R"([ {"k":false}])" };
-		EXPECT_EQ(json.getSize(), 1u);
 		EXPECT_EQ(json.is_object(), false);
 		EXPECT_EQ(json.is_array(), true);
 		EXPECT_EQ(json.is_empty(), false);
 
 		Json &nested = *std::any_cast<Json *>(json[0]);
-		EXPECT_EQ(nested.getSize(), 1u);
 		EXPECT_EQ(nested.is_object(), true);
 		EXPECT_EQ(nested.is_array(), false);
 		EXPECT_EQ(nested.is_empty(), false);
