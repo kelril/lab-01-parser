@@ -389,7 +389,7 @@ std::any return_object(std::stack <std::any>&);
 			 {
 				 return false;
 			 }
-		 if (s.front() > -1 && s.front() < 255)
+		 if (int(s.front()) > 47 && int(s.front()) < 58)
 			 {
 				 if (isdigit(s.front() - '\0'))
 					 {
