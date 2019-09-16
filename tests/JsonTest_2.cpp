@@ -84,17 +84,7 @@ TEST(JsonArray, ArrayWithNull)
 
 TEST(JsonArray, ArrayWithAnything)
 {
-	Json json{ R"(
-        [
-            null,
-            654,
-            false,
-            [ 1, 2, 3 ],
-            100,
-            { "a" : "b" },
-            "i am string"
-        ]
-    )" };
+	Json json{ "[null, 654,false,[ 1, 2, 3 ],100,{ \"a\" : \"b\" },\"String\" ]" };
 
 	EXPECT_EQ(json.is_object(), false);
 	EXPECT_EQ(json.is_array(), true);
@@ -138,6 +128,6 @@ TEST(JsonArray, ArrayWithAnything)
 		EXPECT_EQ(std::any_cast<std::string>(nested["a"]), "b");
 	}
 
-	// "i am string"
-	EXPECT_EQ(std::any_cast<std::string>(json[6]), "i am string");
+	// "String"
+	EXPECT_EQ(std::any_cast<std::string>(json[6]), "String");
 }
