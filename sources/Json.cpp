@@ -89,7 +89,7 @@ std::any return_object(std::stack <std::any>&);
 		///
 		///---------------- В этом блоке мы парсим json строку в стек ----------------
 		///
-		if (s.front() != '{' || s.back() != '}')
+		if ((s.front() != '{' && s.front() != '[') || (s.back() != '}' && s.back() != ']'))
 			{
 				throw WrongJson("Wrong format of .json file!");
 			}
