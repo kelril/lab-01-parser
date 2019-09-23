@@ -189,8 +189,22 @@ std::vector <std::string> object_parser(std::string& s)
 					}
 				if (s.at(i) == '{')
 					{
-						std::string sub_string = s.substr(i, s.find_first_of('}')-i+1);
-						s.erase(i, s.find_first_of('}') - i + 1);
+						int kol=1;
+						size_t j = i+1;
+						while (kol != 0)
+							{
+								if (s.at(j) == '{')
+									{
+										kol++;
+									}
+								if (s.at(j) == '}')
+									{
+										kol--;
+									}
+								j++;
+							}
+						std::string sub_string = s.substr(i,j-i);
+						s.erase(i, j - i);
 						while (!s.empty()&& (s.front() == ',' || s.front() == ' ' ))
 							{
 								s.erase(s.begin());
@@ -214,8 +228,23 @@ std::vector <std::string> object_parser(std::string& s)
 					}	
 				if (s.at(i) == '[')
 					{
-						std::string sub_string = s.substr(i, s.find_first_of(']') - i + 1);
-						s.erase(i, s.find_first_of(']') - i + 1);
+
+						int kol=1;
+						size_t j = i+1;
+						while (kol != 0)
+							{
+								if (s.at(j) == '[')
+									{
+										kol++;
+									}
+								if (s.at(j) == ']')
+									{
+										kol--;
+									}
+								j++;
+							}
+						std::string sub_string = s.substr(i, j - i);
+						s.erase(i, j - i);
 						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
@@ -332,8 +361,22 @@ std::vector <std::string> array_parser(std::string& s)
 					}
 				if (s.at(i) == '{')
 					{
-						std::string sub_string = s.substr(i, s.find_first_of('}')-i+1);
-						s.erase(i, s.find_first_of('}') - i + 1);
+						int kol=1;
+						size_t j = i+1;
+						while (kol != 0)
+							{
+								if (s.at(j) == '{')
+									{
+										kol++;
+									}
+								if (s.at(j) == '}')
+									{
+										kol--;
+									}
+								j++;
+							}
+						std::string sub_string = s.substr(i, j - i);
+						s.erase(i, j - i);
 						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
@@ -352,15 +395,29 @@ std::vector <std::string> array_parser(std::string& s)
 					}	
 				if (s.at(i) == '[')
 					{
-						std::string sub_string = s.substr(i, s.find_first_of(']') - i + 1);
-						s.erase(i, s.find_first_of(']') - i + 1);
-						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
+						int kol=1;
+						size_t j = i+1;
+						while (kol != 0)
+							{
+								if (s.at(j) == '[')
+									{
+										kol++;
+									}
+								if (s.at(j) == ']')
+									{
+										kol--;
+									}
+								j++;
+							}
+						std::string sub_string = s.substr(i, j - i);
+						s.erase(i, j - i);
+						while (!s.empty() &&(s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
 							}
 						std::vector <std::string> sub_object = array_parser(sub_string);
 
-						for (size_t k = 0; k < sub_object.size(); k++)
+						for (size_t k = 0; k < sub_object.size();k++)
 							{
 								string_array.insert(string_array.end() - 1, sub_object.at(k));
 							}
@@ -404,12 +461,21 @@ Json& vector_to_object(std::vector <std::string>& s)
 								if (s.at(i + 1) == "{" || s.at(i + 1) == "[")
 									{
 										size_t k = i;
+										int kol = 0;
 										std::vector <std::string> temp;
 										do
 											{
 												k++;
 												temp.push_back(s.at(k));
-											} while (s.at(k) != "}"&&s.at(k) != "]"&&k<s.size());
+												if (s.at(k).compare("{") == 0 || s.at(k).compare("[") == 0)
+													{
+														kol++;
+													}
+												if (s.at(k).compare("}") == 0 || s.at(k).compare("]") == 0)
+													{
+														kol--;
+													}
+											} while (kol!=0);
 										temp_object.second = &vector_to_object(temp);
 
 										j->AddObject(temp_object.first, temp_object.second);
@@ -440,13 +506,21 @@ Json& vector_to_object(std::vector <std::string>& s)
 						if (s.at(i) == "{" || s.at(i) == "[")
 							{
 								size_t k = i;
+								int kol = 0;
 								std::vector <std::string> temp;
-								temp.push_back(s.at(i));
 								do
-								{
-									k++;
-									temp.push_back(s.at(k));
-								} while (s.at(k) != "}"&&s.at(k) != "]"&&k < s.size());
+									{
+										k++;
+										temp.push_back(s.at(k));
+										if (s.at(k).compare("{") == 0 || s.at(k).compare("[") == 0)
+											{
+												kol++;
+											}
+										if (s.at(k).compare("}") == 0 || s.at(k).compare("]") == 0)
+											{
+												kol--;
+											}
+									} while (kol != 0);
 								temp_array = &vector_to_object(temp);
 								j->AddArray(temp_array);
 
@@ -576,6 +650,106 @@ Json& vector_to_object(std::vector <std::string>& s)
 			 }
 		 return s;
 	 }
+
+/*std::any return_object(std::stack <std::any>& temp_stack)
+	{	
+		// Входящий стек имеет значения:(значение->":"->ключ,значение->":"->ключ,значение->":"->ключ ...) 
+		// Или (значение->значение->значение->значение...)
+		Json *j = new Json;
+		if (temp_stack.empty())
+			{
+				return j;
+			}
+		if (temp_stack.top().type() == typeid(Json *)) // Если стек состоит из Json объектов, то это массив
+			{	
+				if (temp_stack.size() > 1)
+					{
+						Json *temp;
+						while (!temp_stack.empty())
+							{
+								temp = new Json;
+								temp->copy_json(*std::any_cast<Json *>(temp_stack.top()));
+								j->AddArray(temp);
+								temp_stack.pop();
+							}
+					}
+				else
+					{
+						j->copy_json(*std::any_cast<Json *>(temp_stack.top()));
+						temp_stack.pop();
+					}
+					return j;
+			}
+		if (temp_stack.top().type() == typeid(std::string)) // Если стек состоит из std::string объектов, то это обЪект или массив
+			{
+				std::string buffer=std::any_cast<std::string>(temp_stack.top());
+				temp_stack.pop();
+				if (temp_stack.empty() || std::any_cast<std::string>(temp_stack.top()) != ":") // Если нет разделителя, значит это массив
+					{
+						j->AddArray(return_data(buffer));
+						buffer.clear();
+						while (!temp_stack.empty())
+							{
+								if (temp_stack.top().type() != typeid(std::string))
+									{
+										j->AddArray(temp_stack.top());
+									}
+								else
+									{
+										j->AddArray(return_data(std::any_cast<std::string>(temp_stack.top())));
+									}
+								
+								temp_stack.pop();
+							}
+					}
+				else // Если есть разделители, значит это объекты
+					{
+					std::pair<std::string, std::any> *temp_pair = new std::pair<std::string, std::any>;
+					temp_pair->first = buffer;
+					buffer.clear();
+					temp_stack.pop();
+					while (!temp_stack.empty())
+						{
+							if (temp_stack.top().type() == typeid(std::string))
+								{
+									if (std::any_cast<std::string>(temp_stack.top()) == ":") // Игнорируем ":"
+										{
+											temp_stack.pop();
+										}
+								}
+							
+
+							if (temp_pair->first.empty())
+								{
+									temp_pair = new std::pair<std::string, std::any>;
+									temp_pair->first = std::any_cast<std::string>(temp_stack.top());
+								}
+							else if (!temp_pair->first.empty()) // Перестраховка
+								{
+									if (temp_stack.top().type() == typeid(std::string))//Если это стинговая строк, то 
+										{
+											temp_pair->second = return_data(std::any_cast<std::string>(temp_stack.top()));
+										}
+									else // Если это остальные типы, то
+										{
+											temp_pair->second = temp_stack.top();
+										}
+									
+									j->AddObject(temp_pair->first, temp_pair->second);
+									temp_pair->first.clear();
+
+								}
+							temp_stack.pop();
+						}					
+					}
+			}
+		if (j->is_empty() || !temp_stack.empty())
+			{
+				delete j;
+				throw JsonWarning("Something going wrong!");
+			}
+		return j;
+	}*/
 
 std::string any_to_normal(std::any s)
 	{
