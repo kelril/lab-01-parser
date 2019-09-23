@@ -1,4 +1,5 @@
-#include  "Json.hpp"
+#include "pch.h"
+#include  "Json.h"
 
 #include <fstream>
 #include <stack>
@@ -190,18 +191,18 @@ std::vector <std::string> object_parser(std::string& s)
 				if (s.at(i) == '{')
 					{
 						int kol=1;
-						size_t j = i+1;
+						size_t k = i+1;
 						while (kol != 0)
 							{
-								if (s.at(j) == '{')
+								if (s.at(k) == '{')
 									{
 										kol++;
 									}
-								if (s.at(j) == '}')
+								if (s.at(k) == '}')
 									{
 										kol--;
 									}
-								j++;
+								k++;
 							}
 						std::string sub_string = s.substr(i,j-i);
 						s.erase(i, j - i);
@@ -230,18 +231,18 @@ std::vector <std::string> object_parser(std::string& s)
 					{
 
 						int kol=1;
-						size_t j = i+1;
+						size_t k = i+1;
 						while (kol != 0)
 							{
-								if (s.at(j) == '[')
+								if (s.at(k) == '[')
 									{
 										kol++;
 									}
-								if (s.at(j) == ']')
+								if (s.at(k) == ']')
 									{
 										kol--;
 									}
-								j++;
+								k++;
 							}
 						std::string sub_string = s.substr(i, j - i);
 						s.erase(i, j - i);
@@ -362,18 +363,18 @@ std::vector <std::string> array_parser(std::string& s)
 				if (s.at(i) == '{')
 					{
 						int kol=1;
-						size_t j = i+1;
+						size_t k = i+1;
 						while (kol != 0)
 							{
-								if (s.at(j) == '{')
+								if (s.at(k) == '{')
 									{
 										kol++;
 									}
-								if (s.at(j) == '}')
+								if (s.at(k) == '}')
 									{
 										kol--;
 									}
-								j++;
+								k++;
 							}
 						std::string sub_string = s.substr(i, j - i);
 						s.erase(i, j - i);
@@ -396,18 +397,18 @@ std::vector <std::string> array_parser(std::string& s)
 				if (s.at(i) == '[')
 					{
 						int kol=1;
-						size_t j = i+1;
+						size_t k = i+1;
 						while (kol != 0)
 							{
-								if (s.at(j) == '[')
+								if (s.at(k) == '[')
 									{
 										kol++;
 									}
-								if (s.at(j) == ']')
+								if (s.at(k) == ']')
 									{
 										kol--;
 									}
-								j++;
+								k++;
 							}
 						std::string sub_string = s.substr(i, j - i);
 						s.erase(i, j - i);
