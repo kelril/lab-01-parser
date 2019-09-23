@@ -112,6 +112,23 @@ std::vector <std::string> object_parser(std::string& s)
 								s.erase(s.begin());
 							}
 					}
+				if (s.at(i) == ':')
+					{
+						key = s.substr(0, i);
+						value = s.substr(i+1, s.size()-i-1);
+						while (value.find(' ') != std::string::npos)
+							{
+								value.erase(value.find_first_of(' '), 1);
+							}
+						while (key.find(' ') != std::string::npos)
+							{
+								value.erase(value.find_first_of(' '), 1);
+							}
+
+						string_objects.insert(string_objects.end() - 1, key);
+						string_objects.insert(string_objects.end() - 1, ":");
+						string_objects.insert(string_objects.end() - 1, value);
+					}
 				if (s.at(i) == '\"')
 					{
 						j = i;
