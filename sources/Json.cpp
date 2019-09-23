@@ -372,7 +372,7 @@ std::vector <std::string> array_parser(std::string& s)
 						while (value.find(' ') != std::string::npos)
 							{
 								value.erase(value.find_first_of(' '), 1);
-							}
+							}	
 						string_array.insert(string_array.end() - 1, value);
 						value.clear();
 						s.erase(0, i+1);
@@ -480,7 +480,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 								temp_object.first = s.at(i - 1);
 								if (s.at(i + 1) == "{" || s.at(i + 1) == "[")
 									{
-										size_t k = i;
+										size_t k = i+1;
 										int kol = 0;
 										std::vector <std::string> temp;
 										do
@@ -500,7 +500,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 
 										j->AddObject(temp_object.first, temp_object.second);
 
-										s.erase(s.begin(), s.begin()+k+1);
+										s.erase(s.begin(), s.begin()+k+2);
 										i = -1;
 										continue;
 									}
@@ -545,7 +545,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 								temp_array = &vector_to_object(temp);
 								j->AddArray(temp_array);
 
-								s.erase(s.begin(), s.begin() + k);
+								s.erase(s.begin(), s.begin() + k+1);
 								i = -1;
 								continue;
 							}
@@ -554,7 +554,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 								temp_array = return_data(s.at(i));
 								j->AddArray(temp_array);
 
-								s.erase(s.begin(), s.begin() + i+2);
+								s.erase(s.begin(), s.begin() + i+1);
 								i = -1;
 								continue;
 							}
