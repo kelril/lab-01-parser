@@ -201,9 +201,9 @@ std::vector <std::string> object_parser(std::string& s)
 
 						string_objects.insert(string_objects.end() - 1, key);
 						string_objects.insert(string_objects.end() - 1, ":");
-						for (auto i = sub_object.begin(); i != sub_object.end(); i++)
+						for (size_t i = 0; i < sub_object.size(); i++)
 							{
-							string_objects.insert(string_objects.end() - 1, *i);
+								string_objects.insert(string_objects.end() - 1, sub_object.at(i));
 							}
 
 						key.clear();
@@ -226,9 +226,9 @@ std::vector <std::string> object_parser(std::string& s)
 
 						string_objects.insert(string_objects.end() - 1, key);
 						string_objects.insert(string_objects.end() - 1, ":");
-						for (auto i = sub_object.begin(); i != sub_object.end(); i++)
+						for (size_t i = 0; i < sub_object.size(); i++)
 							{
-								string_objects.insert(string_objects.end() - 1, *i);
+								string_objects.insert(string_objects.end() - 1, sub_object.at(i));
 							}
 
 						key.clear();
@@ -342,7 +342,7 @@ std::vector <std::string> array_parser(std::string& s)
 
 						for (size_t i = 0; i < sub_object.size(); i++)
 							{
-								string_objects.insert(string_objects.end() - 1, sub_object.at(i));
+								string_array.insert(string_array.end() - 1, sub_object.at(i));
 							}
 
 						sub_object.clear();
@@ -362,7 +362,7 @@ std::vector <std::string> array_parser(std::string& s)
 
 						for (size_t i = 0; i < sub_object.size(); i++)
 							{
-								string_objects.insert(string_objects.end() - 1, sub_object.at(i));
+								string_array.insert(string_array.end() - 1, sub_object.at(i));
 							}
 
 						sub_object.clear();
