@@ -1,19 +1,27 @@
 #pragma once
+#include "Exceptions.hpp"
+
 #include <string>
 #include <map>
 #include <vector>
 #include <any>
 #include <typeinfo>
 
-#include "Exceptions.hpp"
+std::vector <std::string> array_parser(std::string& s);
+std::vector <std::string> object_parser(std::string& s);
+
+
 
 class Json 
 	{
+	public:
 		// Контейнеры для хранения объектов
 		std::map<std::string, std::any> Objects; // Для хранения объектов
 		std::vector<std::any> Arrays;			 // Для хранения массивов
-		
-	public:
+
+		bool contains_object = false;
+		bool contains_array = false;
+
 		// Конструктор из строки, содержащей Json-данные.
 		Json(const std::string& s);
 		// Конструктор из Json-объекта, содержащей Json-данные.
