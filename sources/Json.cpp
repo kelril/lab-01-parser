@@ -11,11 +11,11 @@ bool Json::is_empty() const
 
 bool Json::is_array() const
 	{
-		return !Arrays.empty();
+		return contains_array;
 	}
 bool Json::is_object() const
 	{
-		return !Objects.empty();
+		return contains_object;
 	}
 
 Json::~Json()
@@ -24,6 +24,7 @@ Json::~Json()
 		Arrays.clear();
 	}
 
+// Function check file existence
 bool is_file(const std::string& s)
 	{
 		bool buffer=false;			// Создаём левую переменную, чтобы конечное значение не исчезло
@@ -45,10 +46,13 @@ Json::Json(const std::string& s)
 			}		
 	}
 
+
 Json::Json(Json& s)
 	{
 		Arrays = s.give_arrays();
 		Objects = s.give_objects();
+		contains_array = s.contains_array;
+		contains_object = s.contains_object;
 	}
 
 std::any& Json::operator[](const std::string& key)
@@ -77,140 +81,422 @@ std::any& Json::operator[](int index)
 		return Arrays[index];
 	}
 
-std::any return_object(std::stack <std::any>&);
+std::any return_data(const std::string s);
+std::any return_data(const std::string s);
 
- Json Json::parse(const std::string& s)
+std::vector <std::string> object_parser(std::string& s)
 	{
-		std::stack <std::any> temp_stack;
-		std::stack <std::any> buffer_stack;
-		std::string buffer;
-		///
-		///---------------- В этом блоке мы парсим json строку в стек ----------------
-		///
-		if ((s.front() != '{' && s.front() != '[') || (s.back() != '}' && s.back() != ']'))
+		std::vector <std::string> string_objects;
+		std::string key;
+		std::string value;
+
+		size_t j = 0;
+
+		if (s.front() != '{' || s.back() != '}')
 			{
-				throw WrongJson("Wrong format of .json file!");
+				throw JsonWarning("Something wrong in json string!");
 			}
 		else
 			{
-				for (int i = 0; i < int(s.size()); i++)
+				string_objects.push_back("{");
+				string_objects.push_back("}");
+				s.pop_back();
+				s.erase(s.begin());
+			}		
+		for (size_t i = 0; i < s.size(); i++)
+			{	
+				if (s.front() == ' ')
 					{
-						switch (s.at(i))
+						while (s.front() == ' ')
 							{
-								case ('"'):break;
-
-								case (' '):break;
-
-								case ('\t'):break;
-
-								case ('\n'):break;
-
-								case (':'): // Сохраняем это как показатель наличия пары
+								s.erase(s.begin());
+							}
+					}
+				if (s.at(i) == '\"')
+					{
+						j = i;
+						while (s.at(j) != ':' && s.at(j) != ',' && s.at(j) != '}' && j+1 != s.size())
+							{
+								j++;
+							}
+						if (value.empty() && !key.empty())
+							{
+								if (j + 1 == s.size())
 									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer = s.at(i);
-										temp_stack.push(buffer);
-										buffer.clear();
-										break;
+										value = s.substr(i, j - i+1);
+									}
+								else
+									{
+										value = s.substr(i, j - i);
 									}
 								
-								case (','):
+								value = value.substr(value.find_first_of('\"')+1, value.find_last_of('\"')-1);
+								key = key.substr(key.find_first_of('\"') + 1, key.find_last_of('\"') - 1);
+
+								string_objects.insert(string_objects.end() - 1, key);
+								string_objects.insert(string_objects.end() - 1, ":");
+								string_objects.insert(string_objects.end() - 1, value);
+
+								key.clear();
+								value.clear();
+								s.erase(0, j+1);
+								i = -1;
+								continue;
+							}
+						if (key.empty())
+							{
+								key = s.substr(i, j - i);
+								key = key.substr(key.find_first_of('\"'), key.find_last_of('\"')+1);
+
+								s.erase(0, j+1);
+								i = -1;
+								continue;
+							}							
+					}
+				if (s.at(i) == ',')
+					{
+						j = i;
+						while (j != 0 && s.at(j) != ':')
+							{
+								j--;
+							}
+						if (key.empty())
+							{
+								throw JsonWarning("Something wrong in json string!");
+							}
+						if (value.empty() && !key.empty())
+							{
+								value = s.substr(j, i - j);
+								while (value.find(' ') != std::string::npos)
 									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer.clear(); break;
+										value.erase(value.find_first_of(' '),1);
 									}
 
-								case ('{'): 
-									{
-										if (!buffer.empty())
-											{
-											temp_stack.push(buffer);
-											}
-										buffer = s.at(i); 
-										temp_stack.push(buffer);
-										buffer.clear();
-										break;
-									} 
+								value = value.substr(value.find_first_of('\"') + 1, value.find_last_of('\"') - 1);
+								key = key.substr(key.find_first_of('\"') + 1, key.find_last_of('\"') - 1);
 
-								case ('['):
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer = s.at(i);
-										temp_stack.push(buffer);
-										buffer.clear();
-										break;
-									}
+								string_objects.insert(string_objects.end() - 1, key);
+								string_objects.insert(string_objects.end() - 1, ":");
+								string_objects.insert(string_objects.end() - 1, value);
 
-								case ('}'):
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										while (true)
-											{
-												if (temp_stack.top().type() == typeid(std::string))
-													{
-														if (std::any_cast<std::string>(temp_stack.top()) == "{")
-															{
-																break;
-															}
-													}
-												buffer_stack.push(temp_stack.top());
-												temp_stack.pop();
-											}
-										temp_stack.pop();
-										temp_stack.push(return_object(buffer_stack));
-										buffer.clear();
-										break;
-									}
+								key.clear();
+								value.clear();
+								s.erase(0, i+1);
+								i = -1;
+								continue;
+							}
 
-								case (']'):
+					}
+				if (s.at(i) == '{')
+					{
+						std::string sub_string = s.substr(i, s.find_first_of('}')-i+1);
+						s.erase(i, s.find_first_of('}') - i + 1);
+						while (!s.empty()&& (s.front() == ',' || s.front() == ' ' ))
+							{
+								s.erase(s.begin());
+							}
+						std::vector <std::string> sub_object = object_parser(sub_string);
+
+						key = key.substr(key.find_first_of('\"') + 1, key.find_last_of('\"') - 1);
+
+						string_objects.insert(string_objects.end() - 1, key);
+						string_objects.insert(string_objects.end() - 1, ":");
+						for (auto i = sub_object.begin(); i != sub_object.end(); i++)
+							{
+							string_objects.insert(string_objects.end() - 1, *i);
+							}
+
+						key.clear();
+						sub_object.clear();
+						sub_string.clear();
+						i = -1;
+						continue;
+					}	
+				if (s.at(i) == '[')
+					{
+						std::string sub_string = s.substr(i, s.find_first_of(']') - i + 1);
+						s.erase(i, s.find_first_of(']') - i + 1);
+						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
+							{
+								s.erase(s.begin());
+							}
+						std::vector <std::string> sub_object = array_parser(sub_string);
+
+						key = key.substr(key.find_first_of('\"') + 1, key.find_last_of('\"') - 1);
+
+						string_objects.insert(string_objects.end() - 1, key);
+						string_objects.insert(string_objects.end() - 1, ":");
+						for (auto i = sub_object.begin(); i != sub_object.end(); i++)
+							{
+								string_objects.insert(string_objects.end() - 1, *i);
+							}
+
+						key.clear();
+						sub_object.clear();
+						sub_string.clear();
+						i = -1;
+						continue;
+					}
+			}
+		if (!s.empty())
+			{
+				if (value.empty() && !key.empty())
+					{
+						value = s;
+						while (value.find(' ') != std::string::npos)
+							{
+								value.erase(value.begin()+value.find_first_of(' '));
+							}
+
+						value = value.substr(value.find_first_of('\"') + 1, value.find_last_of('\"') - 1);
+						key = key.substr(key.find_first_of('\"') + 1, key.find_last_of('\"') - 1);
+
+						string_objects.insert(string_objects.end() - 1, key);
+						string_objects.insert(string_objects.end() - 1, ":");
+						string_objects.insert(string_objects.end() - 1, value);
+
+						key.clear();
+						value.clear();
+						s.clear();
+					}
+			}
+		return string_objects;
+	}
+
+std::vector <std::string> array_parser(std::string& s)
+	{
+		std::vector <std::string> string_array;
+		std::string value;
+
+		size_t j = 0;
+
+		if (s.front() != '[' || s.back() != ']')
+			{
+				throw JsonWarning("Something wrong in json string!");
+			}
+		else
+			{
+				string_array.push_back("[");
+				string_array.push_back("]");
+				s.pop_back();
+				s.erase(s.begin());
+			}		
+		for (size_t i = 0; i < s.size(); i++)
+			{
+				if (s.front() == ' ')
+					{
+						while (s.front() == ' ')
+						{
+							s.erase(s.begin());
+						}
+					}
+				if (s.at(i) == '\"')
+					{
+						j = i;
+						while (s.at(j) != ',' && s.at(j) != ']' && j+1 != s.size())
+							{
+								j++;
+							}
+						if (j + 1 == s.size())
+							{
+								value = s.substr(i, j - i + 1);
+							}
+						else
+							{
+								value = s.substr(i, j - i);
+							}
+						value = value.substr(value.find_first_of('\"'), value.find_last_of('\"') + 1);
+						string_array.insert(string_array.end() - 1, value);
+						value.clear();
+						s.erase(0, j+1);	
+						i = -1;
+						continue;
+					}
+				if (s.at(i) == ',')
+					{
+						j = i;
+						while (j != 0)
+							{
+								j--;
+							}
+						value = s.substr(j, i - j);
+						while (value.find(' ') != std::string::npos)
+							{
+								value.erase(value.find_first_of(' '), 1);
+							}
+						string_array.insert(string_array.end() - 1, value);
+						value.clear();
+						s.erase(0, i+1);
+						i = -1;
+						continue;
+					}
+				if (s.at(i) == '{')
+					{
+						std::string sub_string = s.substr(i, s.find_first_of('}')-i+1);
+						s.erase(i, s.find_first_of('}') - i + 1);
+						while (!s.empty() && s.front() == ',' || s.front() == ' ')
+							{
+								s.erase(s.begin());
+							}
+						std::vector <std::string> sub_object = object_parser(sub_string);
+
+						for (auto i = sub_object.begin(); i != sub_object.end(); i++)
+							{
+								string_array.insert(string_array.end() - 1, *i);
+							}
+
+						sub_object.clear();
+						sub_string.clear();
+						i = -1;
+						continue;
+					}	
+				if (s.at(i) == '[')
+					{
+						std::string sub_string = s.substr(i, s.find_first_of(']') - i + 1);
+						s.erase(i, s.find_first_of(']') - i + 1);
+						while (!s.empty() && s.front() == ',' || s.front() == ' ')
+							{
+								s.erase(s.begin());
+							}
+						std::vector <std::string> sub_object = array_parser(sub_string);
+
+						for (auto i = sub_object.begin(); i != sub_object.end(); i++)
+							{
+								string_array.insert(string_array.end() - 1, *i);
+							}
+
+						sub_object.clear();
+						sub_string.clear();
+						i = -1;
+						continue;
+					}
+			}
+		if (!s.empty())
+			{
+				while (s.find(' ') !=std::string::npos)
+					{
+						s.erase(s.begin()+s.find_first_of(' '));
+					}
+				string_array.insert(string_array.end() - 1, s);
+			}
+		return string_array;
+	}
+
+Json& vector_to_object(std::vector <std::string>& s)
+	{
+		Json *j = new Json;
+		std::pair <std::string, std::any> temp_object;
+		std::any temp_array;
+		if (s.empty())
+			{
+				throw JsonWarning("Something going worng! Please,check your json string!");
+			}
+		if (!s.empty() && s.front().compare("{") == 0)
+			{
+				j->contains_object = true;
+				s.erase(s.begin()); s.pop_back();
+
+				for (size_t i = 0; i < s.size(); i++)
+					{
+						if (s.at(i) == ":")
+							{
+								temp_object.first = s.at(i - 1);
+								if (s.at(i + 1) == "{" || s.at(i + 1) == "[")
 									{
-										if (!buffer.empty())
+										size_t k = i;
+										std::vector <std::string> temp;
+										do
 											{
-												temp_stack.push(buffer);
-											}
-										while (true)
-											{
-												if (temp_stack.top().type() == typeid(std::string))
-													{
-														if (std::any_cast<std::string>(temp_stack.top())=="[")
-															{
-																break;
-															}
-													}
-												buffer_stack.push(temp_stack.top());
-												temp_stack.pop();
-											}
-										temp_stack.pop();
-										temp_stack.push(return_object(buffer_stack));
-										buffer.clear();
-										break;
+												k++;
+												temp.push_back(s.at(k));
+											} while (s.at(k) != "}"&&s.at(k) != "]"&&k<s.size());
+										temp_object.second = &vector_to_object(temp);
+
+										j->AddObject(temp_object.first, temp_object.second);
+
+										s.erase(s.begin(), s.begin()+k+1);
+										i = -1;
+										continue;
 									}
-								default:
-									buffer.push_back(s.at(i));
+								else
+									{
+										temp_object.second = return_data(s.at(i + 1));
+
+										j->AddObject(temp_object.first, temp_object.second);
+
+										s.erase(s.begin(), s.begin() + i + 2);
+										i = -1;
+										continue;
+									}
 							}
 					}
 			}
+		if (!s.empty() && s.front().compare("[")==0)
+			{
+				j->contains_array = true;
+				s.erase(s.begin()); s.pop_back();
+				for (size_t i = 0; i < s.size(); i++)
+					{
+						if (s.at(i) == "{" || s.at(i) == "[")
+							{
+								size_t k = i;
+								std::vector <std::string> temp;
+								temp.push_back(s.at(i));
+								do
+								{
+									k++;
+									temp.push_back(s.at(k));
+								} while (s.at(k) != "}"&&s.at(k) != "]"&&k < s.size());
+								temp_array = &vector_to_object(temp);
+								j->AddArray(temp_array);
+
+								s.erase(s.begin(), s.begin() + k + 1);
+								i = -1;
+								continue;
+							}
+						else
+							{
+								temp_array = return_data(s.at(i));
+								j->AddArray(temp_array);
+
+								s.erase(s.begin(), s.begin() + i + 1);
+								i = -1;
+								continue;
+							}
+					}
+			}
+		return *j;
+	}
+
+ Json Json::parse(const std::string& s)
+	{
+		std::vector <std::string> big_string_vector;
+		std::string buffer;
+
+		///
+		///---------------- В этом блоке мы парсим json строку в вектор ----------------
+		///
+
+		buffer = s;
+		if (s.front() == '{' && s.back() == '}')
+			{
+				big_string_vector = object_parser(buffer);
+			}
+		else if (s.front() == '[' && s.back() == ']')
+			{
+				big_string_vector = array_parser(buffer);
+			}
+		else
+			{
+				throw JsonWarning("Something wrong in json string!");
+			}
+		buffer.clear();
+
 		///
 		///------------------------------- Конец блока -------------------------------
 		///
-		while (!temp_stack.empty())
-			{
-				buffer_stack.push(temp_stack.top());
-				temp_stack.pop();
-			}
-		return *std::any_cast<Json *>(return_object(buffer_stack));;
+
+		return vector_to_object(big_string_vector);
 	}
 
  Json Json::parseFile(const std::string& path_to_file)
@@ -219,9 +505,8 @@ std::any return_object(std::stack <std::any>&);
 
 		std::string buffer_line;
 		std::string buffer;
-		std::stack <std::any> temp_stack;
-		std::stack <std::any> buffer_stack;
-
+		std::vector <std::string> big_string_vector;
+		
 		setlocale(LC_ALL, "ru-RU");
 
 		if (!file.is_open()) // если файл не открыт
@@ -237,132 +522,28 @@ std::any return_object(std::stack <std::any>&);
 			}
 		file.close();
 		///
-		///------------------------------- Начало блока -------------------------------
+		///---------------- В этом блоке мы парсим json строку в вектор ----------------
 		///
-		if (buffer_line.front() != '{' || buffer_line.back() != '}')
+
+		if (buffer_line.front() == '{' && buffer_line.back() == '}')
 			{
-				throw WrongJson("Wrong format of .json file!");
+				big_string_vector = object_parser(buffer_line);
+			}
+		else if (buffer_line.front() == '[' && buffer_line.back() == ']')
+			{
+				big_string_vector = array_parser(buffer_line);
 			}
 		else
 			{
-				for (int i = 1; i+1 < int(buffer_line.size()); i++)
-					{
-						switch (buffer_line.at(i))
-							{
-								case ('"'):break;
-
-								case (' '):break;
-
-								case ('\t'):break;
-
-								case ('\n'):break;
-
-								case (':'): // Сохраняем это как показатель наличия пары
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer = buffer_line.at(i);
-										temp_stack.push(buffer);
-										buffer.clear();
-										break;
-									}
-								
-								case (','):
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer.clear(); break;
-									}
-
-								case ('{'): 
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer = buffer_line.at(i);
-										temp_stack.push(buffer);
-										buffer.clear();
-										break;
-									} 
-
-								case ('['):
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										buffer = buffer_line.at(i);
-										temp_stack.push(buffer);
-										buffer.clear();
-										break;
-									}
-
-								case ('}'):
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										while (true)
-											{
-												if (temp_stack.top().type() == typeid(std::string))
-													{
-														if (std::any_cast<std::string>(temp_stack.top()) == "{")
-															{
-																break;
-															}
-													}
-												buffer_stack.push(temp_stack.top());
-												temp_stack.pop();
-											}
-										temp_stack.pop();
-										temp_stack.push(return_object(buffer_stack));
-										buffer.clear();
-										break;
-									}
-
-								case (']'):
-									{
-										if (!buffer.empty())
-											{
-												temp_stack.push(buffer);
-											}
-										while (true)
-											{
-												if (temp_stack.top().type() == typeid(std::string))
-													{
-														if (std::any_cast<std::string>(temp_stack.top())=="[")
-															{
-																break;
-															}
-													}
-												buffer_stack.push(temp_stack.top());
-												temp_stack.pop();
-											}
-										temp_stack.pop();
-										temp_stack.push(return_object(buffer_stack));
-										buffer.clear();
-										break;
-									}
-								default:
-									buffer.push_back(buffer_line.at(i));
-							}
-					}
+				throw JsonWarning("Something wrong in json string!");
 			}
+		buffer.clear();
+
 		///
 		///------------------------------- Конец блока -------------------------------
 		///
-			while (!temp_stack.empty())
-				{
-					buffer_stack.push(temp_stack.top());
-					temp_stack.pop();
-				}
-			return *std::any_cast<Json *>(return_object(buffer_stack));;
+
+		return vector_to_object(big_string_vector);
 	}
 
  void Json::AddObject(const std::string &key, const std::any &value)
@@ -396,7 +577,7 @@ std::any return_object(std::stack <std::any>&);
 		 return s;
 	 }
 
-std::any return_object(std::stack <std::any>& temp_stack)
+/*std::any return_object(std::stack <std::any>& temp_stack)
 	{	
 		// Входящий стек имеет значения:(значение->":"->ключ,значение->":"->ключ,значение->":"->ключ ...) 
 		// Или (значение->значение->значение->значение...)
@@ -490,12 +671,11 @@ std::any return_object(std::stack <std::any>& temp_stack)
 			}
 		if (j->is_empty() || !temp_stack.empty())
 			{
-				std::cout << j->is_empty() << "|" << !temp_stack.empty();
 				delete j;
 				throw JsonWarning("Something going wrong!");
 			}
 		return j;
-	}
+	}*/
 
 std::string any_to_normal(std::any s)
 	{
@@ -532,14 +712,14 @@ void Json::print()
 				std::cout << "{\n";
 				for (auto i = Objects.begin(); i != Objects.end(); i++)
 					{
-						std::cout << "   \"" << i->first << "\"" << " : ";
+						std::cout << i->first << " : ";
 						if (i->second.type() == typeid(Json *))
 							{
 								std::any_cast<Json *>(i->second)->print();
 							}
 						else
 							{
-								std::cout << "\"" << any_to_normal(i->second) << "\"" << std::endl;
+								std::cout << any_to_normal(i->second) << std::endl;
 							}
 					}
 				std::cout << "}\n";
@@ -555,10 +735,10 @@ void Json::print()
 							}
 						else
 							{
-								std::cout <<"\""<< any_to_normal(*i) << "\"" << std::endl;
+								std::cout << any_to_normal(*i) << std::endl;
 							}
 					}
-				std::cout << "  ]\n\n";
+				std::cout << "  ]\n";
 			}
 		
 	}
