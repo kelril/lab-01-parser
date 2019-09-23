@@ -46,7 +46,6 @@ Json::Json(const std::string& s)
 			}		
 	}
 
-
 Json::Json(Json& s)
 	{
 		Arrays = s.give_arrays();
