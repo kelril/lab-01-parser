@@ -125,6 +125,9 @@ std::vector <std::string> object_parser(std::string& s)
 								value.erase(value.find_first_of(' '), 1);
 							}
 
+						value = value.substr(value.find_first_of('\"') + 1, value.find_last_of('\"') - 1);
+						key = key.substr(key.find_first_of('\"') + 1, key.find_last_of('\"') - 1);
+
 						string_objects.insert(string_objects.end() - 1, key);
 						string_objects.insert(string_objects.end() - 1, ":");
 						string_objects.insert(string_objects.end() - 1, value);
@@ -351,7 +354,7 @@ std::vector <std::string> array_parser(std::string& s)
 							{
 								value = s.substr(i, j - i);
 							}
-						value = value.substr(value.find_first_of('\"'), value.find_last_of('\"') + 1);
+						value = value.substr(value.find_first_of('\"')+1, value.find_last_of('\"') - 1);// Avoid '\"'
 						string_array.insert(string_array.end() - 1, value);
 						value.clear();
 						s.erase(0, j+1);	
@@ -579,7 +582,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 			}
 		else
 			{
-				throw JsonWarning("Something wrong in json string!");
+				throw WrongJson("Something wrong in json string!");
 			}
 		buffer.clear();
 
