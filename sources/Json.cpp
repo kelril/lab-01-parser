@@ -203,8 +203,8 @@ std::vector <std::string> object_parser(std::string& s)
 									}
 								q++;
 							}
-						std::string sub_string = s.substr(i,j-i);
-						s.erase(i, j - i);
+						std::string sub_string = s.substr(i, q - i);
+						s.erase(i, q - i);
 						while (!s.empty()&& (s.front() == ',' || s.front() == ' ' ))
 							{
 								s.erase(s.begin());
@@ -243,8 +243,8 @@ std::vector <std::string> object_parser(std::string& s)
 									}
 								q++;
 							}
-						std::string sub_string = s.substr(i, j - i);
-						s.erase(i, j - i);
+						std::string sub_string = s.substr(i, q - i);
+						s.erase(i, q - i);
 						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
@@ -375,8 +375,8 @@ std::vector <std::string> array_parser(std::string& s)
 									}
 								q++;
 							}
-						std::string sub_string = s.substr(i, j - i);
-						s.erase(i, j - i);
+						std::string sub_string = s.substr(i, q - i);
+						s.erase(i, q - i);
 						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
@@ -409,8 +409,8 @@ std::vector <std::string> array_parser(std::string& s)
 									}
 								q++;
 							}
-						std::string sub_string = s.substr(i, j - i);
-						s.erase(i, j - i);
+						std::string sub_string = s.substr(i, q - i);
+						s.erase(i, q - i);
 						while (!s.empty() &&(s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
