@@ -334,7 +334,7 @@ std::vector <std::string> array_parser(std::string& s)
 					{
 						std::string sub_string = s.substr(i, s.find_first_of('}')-i+1);
 						s.erase(i, s.find_first_of('}') - i + 1);
-						while (!s.empty() && s.front() == ',' || s.front() == ' ')
+						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
 							}
@@ -354,7 +354,7 @@ std::vector <std::string> array_parser(std::string& s)
 					{
 						std::string sub_string = s.substr(i, s.find_first_of(']') - i + 1);
 						s.erase(i, s.find_first_of(']') - i + 1);
-						while (!s.empty() && s.front() == ',' || s.front() == ' ')
+						while (!s.empty() && (s.front() == ',' || s.front() == ' '))
 							{
 								s.erase(s.begin());
 							}
