@@ -201,9 +201,9 @@ std::vector <std::string> object_parser(std::string& s)
 
 						string_objects.insert(string_objects.end() - 1, key);
 						string_objects.insert(string_objects.end() - 1, ":");
-						for (size_t i = 0; i < sub_object.size(); i++)
+						for (size_t k = 0; k < sub_object.size(); k++)
 							{
-								string_objects.insert(string_objects.end() - 1, sub_object.at(i));
+								string_objects.insert(string_objects.end() - 1, sub_object.at(k));
 							}
 
 						key.clear();
@@ -226,9 +226,9 @@ std::vector <std::string> object_parser(std::string& s)
 
 						string_objects.insert(string_objects.end() - 1, key);
 						string_objects.insert(string_objects.end() - 1, ":");
-						for (size_t i = 0; i < sub_object.size(); i++)
+						for (size_t k = 0; k < sub_object.size(); k++)
 							{
-								string_objects.insert(string_objects.end() - 1, sub_object.at(i));
+								string_objects.insert(string_objects.end() - 1, sub_object.at(k));
 							}
 
 						key.clear();
@@ -340,9 +340,9 @@ std::vector <std::string> array_parser(std::string& s)
 							}
 						std::vector <std::string> sub_object = object_parser(sub_string);
 
-						for (size_t i = 0; i < sub_object.size(); i++)
+						for (size_t k = 0; k < sub_object.size(); k++)
 							{
-								string_array.insert(string_array.end() - 1, sub_object.at(i));
+								string_array.insert(string_array.end() - 1, sub_object.at(k));
 							}
 
 						sub_object.clear();
@@ -360,9 +360,9 @@ std::vector <std::string> array_parser(std::string& s)
 							}
 						std::vector <std::string> sub_object = array_parser(sub_string);
 
-						for (size_t i = 0; i < sub_object.size(); i++)
+						for (size_t k = 0; k < sub_object.size(); k++)
 							{
-								string_array.insert(string_array.end() - 1, sub_object.at(i));
+								string_array.insert(string_array.end() - 1, sub_object.at(k));
 							}
 
 						sub_object.clear();
