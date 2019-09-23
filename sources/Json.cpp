@@ -485,7 +485,6 @@ Json& vector_to_object(std::vector <std::string>& s)
 										std::vector <std::string> temp;
 										do
 											{
-												k++;
 												temp.push_back(s.at(k));
 												if (s.at(k).compare("{") == 0 || s.at(k).compare("[") == 0)
 													{
@@ -495,6 +494,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 													{
 														kol--;
 													}
+												k++;
 											} while (kol!=0);
 										temp_object.second = &vector_to_object(temp);
 
@@ -510,7 +510,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 
 										j->AddObject(temp_object.first, temp_object.second);
 
-										s.erase(s.begin(), s.begin() + i + 2);
+										s.erase(s.begin(), s.begin() + i+2);
 										i = -1;
 										continue;
 									}
@@ -530,7 +530,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 								std::vector <std::string> temp;
 								do
 									{
-										k++;
+										
 										temp.push_back(s.at(k));
 										if (s.at(k).compare("{") == 0 || s.at(k).compare("[") == 0)
 											{
@@ -540,11 +540,12 @@ Json& vector_to_object(std::vector <std::string>& s)
 											{
 												kol--;
 											}
+										k++;
 									} while (kol != 0);
 								temp_array = &vector_to_object(temp);
 								j->AddArray(temp_array);
 
-								s.erase(s.begin(), s.begin() + k + 1);
+								s.erase(s.begin(), s.begin() + k);
 								i = -1;
 								continue;
 							}
@@ -553,7 +554,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 								temp_array = return_data(s.at(i));
 								j->AddArray(temp_array);
 
-								s.erase(s.begin(), s.begin() + i + 1);
+								s.erase(s.begin(), s.begin() + i+2);
 								i = -1;
 								continue;
 							}
