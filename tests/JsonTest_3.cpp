@@ -5,7 +5,7 @@
 TEST(JsonObject, EmptyObject)
 	{
 		Json json{"{}"};
-		EXPECT_EQ(json.is_object(), false);
+		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), true);
 	}
