@@ -46,6 +46,7 @@ Json::Json(const std::string& s)
 			}		
 	}
 
+
 Json::Json(Json& s)
 	{
 		Arrays = s.give_arrays();
@@ -499,7 +500,11 @@ Json& vector_to_object(std::vector <std::string>& s)
 
 										j->AddObject(temp_object.first, temp_object.second);
 
-										s.erase(s.begin(), s.begin()+k+2);
+										s.erase(s.begin(), s.begin()+k);
+										while (!s.empty() && (s.front().compare(",")==0 || s.front().compare(" ")==0))
+											{
+												s.erase(s.begin());
+											}
 										i = -1;
 										continue;
 									}
@@ -544,7 +549,11 @@ Json& vector_to_object(std::vector <std::string>& s)
 								temp_array = &vector_to_object(temp);
 								j->AddArray(temp_array);
 
-								s.erase(s.begin(), s.begin() + k+1);
+								s.erase(s.begin(), s.begin() + k);
+								while (!s.empty() && (s.front().compare(",") == 0 || s.front().compare(" ") == 0))
+								{
+									s.erase(s.begin());
+								}
 								i = -1;
 								continue;
 							}
