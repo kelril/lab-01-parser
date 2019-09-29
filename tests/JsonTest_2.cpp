@@ -20,8 +20,8 @@ TEST(JsonArray, MultitypeArray)
 		EXPECT_EQ(json.is_empty(), false);
 
 		EXPECT_EQ(std::any_cast<double>(json[0]), 1.5);
-		EXPECT_EQ(std::any_cast<std::string>(json[1]), "\"String\"");
-		EXPECT_EQ(std::any_cast<std::string>(json[2]), "\"AnotherString\"");
+		EXPECT_EQ(std::any_cast<std::string>(json[1]), "String");
+		EXPECT_EQ(std::any_cast<std::string>(json[2]), "AnotherString");
 		EXPECT_EQ(std::any_cast<bool>(json[3]), false);
 	}
 
@@ -50,7 +50,7 @@ TEST(JsonArray, ArrayWithObjects)
 		EXPECT_EQ(nested.is_array(), false);
 		EXPECT_EQ(nested.is_empty(), false);
 
-		EXPECT_EQ(std::any_cast<std::string>(nested["a"]), "\"b\"");
+		EXPECT_EQ(std::any_cast<std::string>(nested["a"]), "b");
 	}
 
 	{
@@ -129,5 +129,5 @@ TEST(JsonArray, ArrayWithAnything)
 		}
 
 		// "String"
-		EXPECT_EQ(std::any_cast<std::string>(json[6]), "\"String\"");
+		EXPECT_EQ(std::any_cast<std::string>(json[6]), "String");
 	}
