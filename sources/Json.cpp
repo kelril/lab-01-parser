@@ -59,11 +59,11 @@ std::any& Json::operator[](const std::string& key)
 			{
 				throw JsonNoContainer("Objects don't exists!");
 			}
-		if (Objects.find('\"'+key+ '\"') == Objects.end())
+		if (Objects.find(key) == Objects.end())
 			{
 				throw JsonWrongKey("No objects with this key!");
 			}
-		return Objects['\"'+key+ '\"'];
+		return Objects[key];
 	}
 
 std::any& Json::operator[](int index)
@@ -119,6 +119,18 @@ void start_prepearing_string(std::string& s, std::vector <std::string>& vec)
 			}
 	}
 
+void clear_quotes(std::string & s)
+	{
+		if (s.front() == '\"')
+			{
+				s.erase(s.begin());
+			}
+		if (s.back() == '\"')
+		{
+			s.pop_back();
+		}
+	}
+
 // Функция очистки строки от ненужных символов в начале и конце
 void clear_begback_of_string(std::string & s)
 	{
@@ -166,6 +178,8 @@ std::pair<std::string, std::string> objfound_colon(std::string& s, std::pair <st
 
 		clear_begback_of_string(temp_pair.first);
 		clear_begback_of_string(temp_pair.second);
+		clear_quotes(temp_pair.first);
+		clear_quotes(temp_pair.second);
 
 		s.erase(0, j+1);
 
@@ -193,6 +207,8 @@ std::pair<std::string, std::string> objfound_quote(std::string& s, std::vector <
 
 				clear_begback_of_string(temp_pair.first);
 				clear_begback_of_string(temp_pair.second);
+				clear_quotes(temp_pair.first);
+				clear_quotes(temp_pair.second);
 
 				vec.insert(vec.end() - 1, temp_pair.first);
 				vec.insert(vec.end() - 1, ":");
@@ -232,6 +248,8 @@ void objfound_comma(std::string& s, std::vector <std::string>& vec, std::pair <s
 
 				clear_begback_of_string(temp_pair.first);
 				clear_begback_of_string(temp_pair.second);
+				clear_quotes(temp_pair.first);
+				clear_quotes(temp_pair.second);
 
 				vec.insert(vec.end() - 1, temp_pair.first);
 				vec.insert(vec.end() - 1, ":");
@@ -273,6 +291,7 @@ void objfound_begin_of_anobj(std::string& s, std::vector <std::string>& vec, std
 		std::vector <std::string> sub_object = object_parser(sub_string);
 
 		clear_begback_of_string(temp_pair.first);
+		clear_quotes(temp_pair.first);
 
 		vec.insert(vec.end() - 1, temp_pair.first);
 		vec.insert(vec.end() - 1, ":");
@@ -311,6 +330,7 @@ void objfound_begin_of_anarr(std::string&s, std::vector <std::string>& vec, std:
 		std::vector <std::string> sub_object = array_parser(sub_string);
 
 		clear_begback_of_string(temp_pair.first);
+		clear_quotes(temp_pair.first);
 
 		vec.insert(vec.end() - 1, temp_pair.first);
 		vec.insert(vec.end() - 1, ":");
@@ -413,6 +433,7 @@ void arrfound_quote(std::string&s, std::vector <std::string>& vec, size_t i)
 				value = s.substr(i, j - i);
 			}
 		clear_begback_of_string(value);
+		clear_quotes(value);
 		vec.insert(vec.end() - 1, value);
 		value.clear();
 		s.erase(0, j + 1);
@@ -429,6 +450,7 @@ void arrfound_comma(std::string&s, std::vector <std::string>& vec, size_t i)
 			}
 		value = s.substr(j, i - j);
 		clear_begback_of_string(value);
+		clear_quotes(value);
 		vec.insert(vec.end() - 1, value);
 		value.clear();
 		s.erase(0, i + 1);
