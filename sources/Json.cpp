@@ -86,7 +86,7 @@ std::any return_data(const std::string s);
 // Функция, которая обрабатывает в начале входящую строку
 void start_prepearing_string(std::string& s, std::vector <std::string>& vec)
 	{
-		switch (s.front())
+		switch (s.front()) 
 			{
 				case ('{'):
 					{
@@ -98,6 +98,8 @@ void start_prepearing_string(std::string& s, std::vector <std::string>& vec)
 								s.erase(s.begin());
 								break;
 							}
+						throw JsonWarning("Something wrong in json string!"); // Это тупое повторение, потому что в MVS все без проблем, а в CMakeLists.txt тут, видете ли, fall
+						break;
 					}
 				case ('['):
 					{
@@ -109,6 +111,8 @@ void start_prepearing_string(std::string& s, std::vector <std::string>& vec)
 								s.erase(s.begin());
 								break;
 							}
+						throw JsonWarning("Something wrong in json string!");
+						break;
 					}
 			default:
 				throw JsonWarning("Something wrong in json string!");
