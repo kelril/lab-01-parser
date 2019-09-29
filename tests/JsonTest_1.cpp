@@ -15,7 +15,7 @@ TEST(Json, ExampleJson)
 	{
 		Json object("{\"lastname\" : \"Ivanov\",\"firstname\" : \"Ivan\",\"age\" : 25,\"islegal\" : false,\"marks\" : [4,5,5,5,2,3],\"address\" : {\"city\" : \"Moscow\",\"street\" : \"Vozdvijenka\"}}");
 
-		EXPECT_EQ(std::any_cast<std::string>(object["lastname"]), "\"Ivanov\"");
+		EXPECT_EQ(std::any_cast<std::string>(object["lastname"]), "Ivanov");
 		EXPECT_EQ(std::any_cast<bool>(object["islegal"]), false);
 		EXPECT_EQ(std::any_cast<double>(object["age"]), 25);
 
@@ -24,8 +24,8 @@ TEST(Json, ExampleJson)
 		EXPECT_EQ(std::any_cast<double>(marks[1]), 5);
 
 		Json &address = *std::any_cast<Json *>(object["address"]);
-		EXPECT_EQ(std::any_cast<std::string>(address["city"]), "\"Moscow\"");
-		EXPECT_EQ(std::any_cast<std::string>(address["street"]), "\"Vozdvijenka\"");
+		EXPECT_EQ(std::any_cast<std::string>(address["city"]), "Moscow");
+		EXPECT_EQ(std::any_cast<std::string>(address["street"]), "Vozdvijenka");
 	}
 
 TEST(Json, ParseFile)
@@ -50,7 +50,7 @@ TEST(Json, AddObject)
 			Json json{ "{}" };
 			json.AddObject("key", std::string("value"));
 
-			EXPECT_EQ(std::any_cast<std::string>(json["key"]), "\"value\"");
+			EXPECT_EQ(std::any_cast<std::string>(json["key"]), "value");
 	}
 
 TEST(Json, OperatorArrayTypeException)
