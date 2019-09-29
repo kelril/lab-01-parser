@@ -4,7 +4,7 @@
 
 TEST(JsonObject, EmptyObject)
 	{
-		Json json{"{}"};
+		Json json{ "{}" };
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), true);
@@ -12,17 +12,17 @@ TEST(JsonObject, EmptyObject)
 
 TEST(JsonObject, SimpleObject)
 	{
-		Json json{"{ \"key\" : \"value\" }"};
+		Json json{ "{ \"key\" : \"value\" }" };
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
 
-		EXPECT_EQ(std::any_cast<std::string>(json["key"]), "value");
+		EXPECT_EQ(std::any_cast<std::string>(json["key"]), "\"value\"");
 	}
 
 TEST(JsonObject, ObjectInsideObject)
 	{
-		Json json{"{ \"key\" : { \"number\":   9.5 } }"};
+		Json json{ "{ \"key\" : { \"number\":   9.5 } }" };
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
@@ -37,7 +37,7 @@ TEST(JsonObject, ObjectInsideObject)
 
 TEST(JsonObject, ObjectdWithArray)
 	{
-		Json json{"{ \"key\" : [1,2,3] }"};
+		Json json{ "{ \"key\" : [1,2,3] }" };
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
@@ -52,7 +52,7 @@ TEST(JsonObject, ObjectdWithArray)
 
 TEST(JsonObject, ObjectsWithArrayAndValues)
 	{
-		Json json{"{ \"key\" : [1,2,3], \"key2\": true }"};
+		Json json{ "{ \"key\" : [1,2,3], \"key2\": true }" };
 		EXPECT_EQ(json.is_object(), true);
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
@@ -72,7 +72,7 @@ TEST(JsonObject, ObjectsWithArrayAndValues)
 TEST(JsonObject, CharAfterEndException)
 	{
 		EXPECT_THROW(
-			Json{"{},"},
+			Json{ "{}," },
 			WrongJson
 		);
 	}
