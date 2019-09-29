@@ -17,7 +17,7 @@ TEST(JsonObject, SimpleObject)
 		EXPECT_EQ(json.is_array(), false);
 		EXPECT_EQ(json.is_empty(), false);
 
-		EXPECT_EQ(std::any_cast<std::string>(json["key"]), "\"value\"");
+		EXPECT_EQ(std::any_cast<std::string>(json["key"]), "value");
 	}
 
 TEST(JsonObject, ObjectInsideObject)
