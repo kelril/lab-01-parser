@@ -223,6 +223,7 @@ std::pair<std::string, std::string> objfound_quote(std::string& s, std::vector <
 			{
 				temp_pair.first = s.substr(i, j - i - 1);
 				clear_begback_of_string(temp_pair.first);
+				clear_quotes(temp_pair.first);
 				s.erase(0, j + 1);
 				i = -1;
 			}
@@ -802,106 +803,6 @@ Json& vector_to_object(std::vector <std::string>& s)
 			 }
 		 return s;
 	 }
-
-/*std::any return_object(std::stack <std::any>& temp_stack)
-	{	
-		// Входящий стек имеет значения:(значение->":"->ключ,значение->":"->ключ,значение->":"->ключ ...) 
-		// Или (значение->значение->значение->значение...)
-		Json *j = new Json;
-		if (temp_stack.empty())
-			{
-				return j;
-			}
-		if (temp_stack.top().type() == typeid(Json *)) // Если стек состоит из Json объектов, то это массив
-			{	
-				if (temp_stack.size() > 1)
-					{
-						Json *temp;
-						while (!temp_stack.empty())
-							{
-								temp = new Json;
-								temp->copy_json(*std::any_cast<Json *>(temp_stack.top()));
-								j->AddArray(temp);
-								temp_stack.pop();
-							}
-					}
-				else
-					{
-						j->copy_json(*std::any_cast<Json *>(temp_stack.top()));
-						temp_stack.pop();
-					}
-					return j;
-			}
-		if (temp_stack.top().type() == typeid(std::string)) // Если стек состоит из std::string объектов, то это обЪект или массив
-			{
-				std::string buffer=std::any_cast<std::string>(temp_stack.top());
-				temp_stack.pop();
-				if (temp_stack.empty() || std::any_cast<std::string>(temp_stack.top()) != ":") // Если нет разделителя, значит это массив
-					{
-						j->AddArray(return_data(buffer));
-						buffer.clear();
-						while (!temp_stack.empty())
-							{
-								if (temp_stack.top().type() != typeid(std::string))
-									{
-										j->AddArray(temp_stack.top());
-									}
-								else
-									{
-										j->AddArray(return_data(std::any_cast<std::string>(temp_stack.top())));
-									}
-								
-								temp_stack.pop();
-							}
-					}
-				else // Если есть разделители, значит это объекты
-					{
-					std::pair<std::string, std::any> *temp_pair = new std::pair<std::string, std::any>;
-					temp_pair->first = buffer;
-					buffer.clear();
-					temp_stack.pop();
-					while (!temp_stack.empty())
-						{
-							if (temp_stack.top().type() == typeid(std::string))
-								{
-									if (std::any_cast<std::string>(temp_stack.top()) == ":") // Игнорируем ":"
-										{
-											temp_stack.pop();
-										}
-								}
-							
-
-							if (temp_pair->first.empty())
-								{
-									temp_pair = new std::pair<std::string, std::any>;
-									temp_pair->first = std::any_cast<std::string>(temp_stack.top());
-								}
-							else if (!temp_pair->first.empty()) // Перестраховка
-								{
-									if (temp_stack.top().type() == typeid(std::string))//Если это стинговая строк, то 
-										{
-											temp_pair->second = return_data(std::any_cast<std::string>(temp_stack.top()));
-										}
-									else // Если это остальные типы, то
-										{
-											temp_pair->second = temp_stack.top();
-										}
-									
-									j->AddObject(temp_pair->first, temp_pair->second);
-									temp_pair->first.clear();
-
-								}
-							temp_stack.pop();
-						}					
-					}
-			}
-		if (j->is_empty() || !temp_stack.empty())
-			{
-				delete j;
-				throw JsonWarning("Something going wrong!");
-			}
-		return j;
-	}*/
 
 std::string any_to_normal(std::any s)
 	{
