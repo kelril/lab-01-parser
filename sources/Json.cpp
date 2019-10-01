@@ -121,11 +121,11 @@ void start_prepearing_string(std::string& s, std::vector <std::string>& vec)
 
 void clear_quotes(std::string & s)
 	{
-		if (s.front() == '\"')
+		if (s.front() == '\"' || s.front() == '\'')
 			{
 				s.erase(s.begin());
 			}
-		if (s.back() == '\"')
+		if (s.back() == '\"' || s.back() == '\'')
 		{
 			s.pop_back();
 		}
@@ -263,86 +263,97 @@ void objfound_comma(std::string& s, std::vector <std::string>& vec, std::pair <s
 			}
 	}
 
+std::pair <size_t, size_t> find_segment_borders(std::string s, size_t index)
+	{
+		char my_char = s.at(index);
+		char reverse_char;
+		
+		if (my_char == '{')
+			{
+				reverse_char = '}';
+			}
+		else if (my_char == '[')
+			{
+				reverse_char = ']';
+			}
+
+		size_t temp = index;
+		size_t last = s.find_first_of(reverse_char, index);
+
+		while (s.find_first_of(my_char, temp) < s.find_first_of(my_char, temp + 1) && s.find_first_of(my_char, temp + 1) < s.find_first_of(reverse_char, last))
+			{
+				temp = s.find_first_of(my_char, temp + 1);			// <- Это мы находим сколько вложенных
+				last = s.find_first_of(reverse_char, last + 1);		// <- Это мы находим следущую закрывающую скобку
+			}
+		return std::make_pair(index,s.find_first_of(reverse_char, last));
+	}
+
 void objfound_begin_of_anobj(std::string& s, std::vector <std::string>& vec, std::pair <std::string, std::string>& temp_pair, size_t i)
 	{
-		int kol = 1;
-		size_t j = i + 1;
+		std::vector<std::vector<std::string>> nested;
+		std::pair <size_t, size_t> borders;
+		std::string sub_string;
 
-		while (j<s.size() && kol != 0) // Как одно из решений вложенности
+		std::string key = temp_pair.first;
+
+		clear_pair(temp_pair);
+
+		while (!s.empty() && s.front() == '{')
 			{
-				//std::cout << s.at(j);
-				if (s.at(j) == '{')
-					{
-						kol++;
-					}
-				if (s.at(j) == '}')
-					{
-						kol--;
-					}
-				j++;
+				borders = find_segment_borders(s, i);
+				sub_string = s.substr(borders.first, borders.second - borders.first + 1);
+				s.erase(borders.first, borders.second - borders.first + 1);
+				clear_begback_of_string(s);
+
+				nested.push_back(object_parser(sub_string));
 			}
-		if (j == i + 1)
-			{
-				throw JsonWarning("Something wrong in json string!");
-			}
-		std::string sub_string = s.substr(i, j - i);
-		s.erase(i, j - i);
-		clear_begback_of_string(s);
 
-		std::vector <std::string> sub_object = object_parser(sub_string);
-
-		clear_begback_of_string(temp_pair.first);
-		clear_quotes(temp_pair.first);
-
-		vec.insert(vec.end() - 1, temp_pair.first);
+		vec.insert(vec.end() - 1, key);
 		vec.insert(vec.end() - 1, ":");
-		for (size_t k = 0; k < sub_object.size(); k++)
+
+		while (!nested.empty())
 			{
-			vec.insert(vec.end() - 1, sub_object.at(k));
+				for (auto a = nested.back().begin(); a != nested.back().end(); a++)
+					{
+						vec.insert(vec.end() - 1, *a);
+					}		
+				nested.pop_back();
 			}
 
 		clear_pair(temp_pair);
-		sub_object.clear();
+		nested.clear();
 		sub_string.clear();
 	}
 
 void objfound_begin_of_anarr(std::string&s, std::vector <std::string>& vec, std::pair <std::string, std::string>& temp_pair, size_t i)
 	{
-		int kol = 1;
-		size_t j = i + 1;
-		while (kol != 0)
+		std::vector<std::vector<std::string>> nested;
+		std::pair <size_t, size_t> borders;
+		std::string sub_string;
+
+		while (!s.empty() && s.front()=='[')
 			{
-				//std::cout << s.at(j);
-				if (s.at(j) == '[')
-					{
-						kol++;
-					}
-				if (s.at(j) == ']')
-					{
-						kol--;
-					}
-				j++;
+				borders = find_segment_borders(s, i);
+				sub_string = s.substr(borders.first, borders.second - borders.first + 1);
+				s.erase(borders.first, borders.second - borders.first + 1);
+				clear_begback_of_string(s);
+
+				nested.push_back(array_parser(sub_string));
 			}
-		std::string sub_string = s.substr(i, j - i);
-		s.erase(i, j - i);
-
-		clear_begback_of_string(s);
-
-		std::vector <std::string> sub_object = array_parser(sub_string);
-
-		clear_begback_of_string(temp_pair.first);
-		clear_quotes(temp_pair.first);
-
 		vec.insert(vec.end() - 1, temp_pair.first);
 		vec.insert(vec.end() - 1, ":");
-		for (size_t k = 0; k < sub_object.size(); k++)
+		while (!nested.empty())
 			{
-				vec.insert(vec.end() - 1, sub_object.at(k));
+				for (auto a = nested.back().begin(); a != nested.back().end(); a++)
+					{
+						vec.insert(vec.end() - 1, *a);
+					}		
+				nested.pop_back();
 			}
 
 		clear_pair(temp_pair);
-		sub_object.clear();
-		sub_string.clear();;
+		nested.clear();
+		sub_string.clear();
 	}
 ///							-----------
 
@@ -370,7 +381,7 @@ std::vector <std::string> object_parser(std::string& s)
 						clear_pair(keyval);
 						continue;
 					}
-				if (s.at(i) == '\"')
+				if (s.at(i) == '\"' || s.at(i) == '\'')
 					{
 						keyval = objfound_quote(s, string_objects, keyval, i);
 						i = start_point;
@@ -486,6 +497,7 @@ void arrfound_begin_of_anobj(std::string&s, std::vector <std::string>& vec, size
 		sub_object.clear();
 		sub_string.clear();
 	}
+
 void arrfound_begin_of_anoarr(std::string&s, std::vector <std::string>& vec, size_t i)
 	{
 		int kol = 1;
@@ -583,27 +595,28 @@ void object_gatherer(std::vector <std::string>& s, Json *j)
 						temp_object.first = s.at(i - 1);
 						if (s.at(i + 1) == "{" || s.at(i + 1) == "[")
 							{
-								size_t k = i + 1;
+								auto k = s .begin() + i + 1;
 								int kol = 0;
 								std::vector <std::string> temp;
 								do
 									{
-										temp.push_back(s.at(k));
-										if (s.at(k).compare("{") == 0 || s.at(k).compare("[") == 0)
+										temp.push_back(*k);
+										if (k->compare("{") == 0 ||k->compare("[") == 0)
 											{
 												kol++;
 											}
-										if (s.at(k).compare("}") == 0 || s.at(k).compare("]") == 0)
+										if (k->compare("}") == 0 || k->compare("]") == 0)
 											{
 												kol--;
 											}
 										k++;
-									} while (kol != 0);
+									} while (kol != 0 && k+1!=s.end());
+
 								temp_object.second = &vector_to_object(temp);
 
 								j->AddObject(temp_object.first, temp_object.second);
 
-								s.erase(s.begin(), s.begin() + k);
+								s.erase(s.begin(), k);
 								while (!s.empty() && (s.front().compare(",") == 0 || s.front().compare(" ") == 0))
 									{
 										s.erase(s.begin());
@@ -636,27 +649,26 @@ void array_gatherer(std::vector <std::string>& s, Json *j)
 			{
 				if (s.at(i) == "{" || s.at(i) == "[")
 					{
-						size_t k = i;
+						auto k = s.begin() + i + 1;
 						int kol = 0;
 						std::vector <std::string> temp;
 						do
 							{
-
-								temp.push_back(s.at(k));
-								if (s.at(k).compare("{") == 0 || s.at(k).compare("[") == 0)
+								temp.push_back(*k);
+								if (k->compare("{") == 0 || k->compare("[") == 0)
 									{
 										kol++;
 									}
-								if (s.at(k).compare("}") == 0 || s.at(k).compare("]") == 0)
+								if (k->compare("}") == 0 || k->compare("]") == 0)
 									{
 										kol--;
 									}
 								k++;
-							} while (kol != 0);
+							} while (kol != 0 && k + 1 != s.end());
 						temp_array = &vector_to_object(temp);
 						j->AddArray(temp_array);
 
-						s.erase(s.begin(), s.begin() + k);
+						s.erase(s.begin(), k);
 						while (!s.empty() && (s.front().compare(",") == 0 || s.front().compare(" ") == 0))
 							{
 								s.erase(s.begin());
@@ -834,7 +846,7 @@ std::string any_to_normal(std::any s)
 void Json::print()
 	{
 		setlocale(LC_ALL, "ru-RU");
-		if (!Objects.empty())
+		if (is_object())
 			{
 				std::cout << "{\n";
 				for (auto i = Objects.begin(); i != Objects.end(); i++)
@@ -851,7 +863,7 @@ void Json::print()
 					}
 				std::cout << "}\n";
 			}
-		if (!Arrays.empty())
+		else   // Если не объект, то массив
 			{
 				std::cout << "  [\n";
 				for (auto i = Arrays.begin(); i != Arrays.end(); i++)
