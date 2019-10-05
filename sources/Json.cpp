@@ -1,4 +1,5 @@
-#include  "Json.hpp"
+#include "pch.h"
+#include  "Json.h"
 
 const std::set <char> unused_chars {' ','\n','\t',','};
 const std::set <char> edge_chars {',',']','}',':'};
@@ -302,7 +303,7 @@ std::pair <size_t, size_t> find_segment_borders(std::string s, size_t index)
 				temp = s.find_first_of(my_char, temp + 1);			// <- Это мы находим сколько вложенных
 				last = s.find_first_of(reverse_char, last + 1);		// <- Это мы находим следущую закрывающую скобку
 			}
-		return std::make_pair(index,s.find_first_of(reverse_char, last));
+		return std::make_pair(index,s.find_first_of(reverse_char, last)+1);
 	}
 
 void objfound_begin_of_anobj(std::string& s, std::vector <std::string>& vec, std::pair <std::string, std::string>& temp_pair, size_t i)
@@ -318,8 +319,8 @@ void objfound_begin_of_anobj(std::string& s, std::vector <std::string>& vec, std
 		while (!s.empty() && s.front() == '{')
 			{
 				borders = find_segment_borders(s, i);
-				sub_string = s.substr(borders.first, borders.second - borders.first + 1);
-				s.erase(borders.first, borders.second - borders.first + 1);
+				sub_string = s.substr(borders.first, borders.second - borders.first);
+				s.erase(borders.first, borders.second - borders.first);
 				clear_begback_of_string(s);
 
 				nested.push_back(object_parser(sub_string));
@@ -351,8 +352,8 @@ void objfound_begin_of_anarr(std::string&s, std::vector <std::string>& vec, std:
 		while (!s.empty() && s.front()=='[')
 			{
 				borders = find_segment_borders(s, i);
-				sub_string = s.substr(borders.first, borders.second - borders.first + 1);
-				s.erase(borders.first, borders.second - borders.first + 1);
+				sub_string = s.substr(borders.first, borders.second - borders.first);
+				s.erase(borders.first, borders.second - borders.first);
 				clear_begback_of_string(s);
 
 				nested.push_back(array_parser(sub_string));
@@ -465,50 +466,38 @@ void arrfound_quote(std::string&s, std::vector <std::string>& vec, size_t i)
 		clear_quotes(value);
 		vec.insert(vec.end() - 1, value);
 		value.clear();
+
 		s.erase(0, j + 1);
+		clear_begback_of_string(s);
 	}
 
 void arrfound_comma(std::string&s, std::vector <std::string>& vec, size_t i)
 	{
 		std::string value;
-		size_t j = i;
 
-		while (j != 0)
-			{
-				j--;
-			}
-		value = s.substr(j, i - j);
+		value = s.substr(0, i);
 		clear_begback_of_string(value);
 		clear_quotes(value);
 		vec.insert(vec.end() - 1, value);
 		value.clear();
+
 		s.erase(0, i + 1);
+		clear_begback_of_string(s);
 	}
 
 void arrfound_begin_of_anobj(std::string&s, std::vector <std::string>& vec, size_t i)
 	{
-		int kol = 1;
-		size_t q = i + 1;
-		while (kol != 0)
-			{
-				if (s.at(q) == '{')
-					{
-						kol++;
-					}
-				if (s.at(q) == '}')
-					{
-						kol--;
-					}
-				q++;
-			}
-		std::string sub_string = s.substr(i, q - i);
-		s.erase(i, q - i);
+		std::pair <size_t, size_t> borders = find_segment_borders(s, i);
+
+		std::string sub_string = s.substr(borders.first, borders.second);
+		s.erase(borders.first, borders.second);
 		clear_begback_of_string(s);
+
 		std::vector <std::string> sub_object = object_parser(sub_string);
 
-		for (size_t k = 0; k < sub_object.size(); k++)
+		for (auto k = sub_object.begin(); k != sub_object.end(); k++)
 			{
-				vec.insert(vec.end() - 1, sub_object.at(k));
+				vec.insert(vec.end() - 1, *k);
 			}
 
 		sub_object.clear();
@@ -517,28 +506,17 @@ void arrfound_begin_of_anobj(std::string&s, std::vector <std::string>& vec, size
 
 void arrfound_begin_of_anoarr(std::string&s, std::vector <std::string>& vec, size_t i)
 	{
-		int kol = 1;
-		size_t q = i + 1;
-		while (kol != 0)
-			{
-				if (s.at(q) == '[')
-					{
-						kol++;
-					}
-				if (s.at(q) == ']')
-					{
-						kol--;
-					}
-				q++;
-			}
-		std::string sub_string = s.substr(i, q - i);
-		s.erase(i, q - i);
+		std::pair <size_t, size_t> borders = find_segment_borders(s, i);
+
+		std::string sub_string = s.substr(borders.first, borders.second);
+		s.erase(borders.first, borders.second);
 		clear_begback_of_string(s);
+
 		std::vector <std::string> sub_object = array_parser(sub_string);
 
-		for (size_t k = 0; k < sub_object.size(); k++)
+		for (auto k = sub_object.begin(); k != sub_object.end(); k++)
 			{
-				vec.insert(vec.end() - 1, sub_object.at(k));
+				vec.insert(vec.end() - 1, *k);
 			}
 
 		sub_object.clear();
@@ -610,6 +588,10 @@ std::pair <std::vector<std::string>::iterator, std::vector<std::string>::iterato
 			{
 				reverse_char = "]" - '\0';
 			}
+		else
+			{
+				throw JsonWarning("Что-то пошло не так!");
+			}
 
 		auto temp = s.begin() + index;
 		auto last = std::find(std::begin(s)+index, std::end(s), reverse_char);
@@ -678,7 +660,7 @@ void array_gatherer(std::vector <std::string>& s, Json *j)
 			{
 				if (s.at(i) == "{" || s.at(i) == "[")
 					{
-						borders = find_for_gatherer_borders(s, i + 1);
+						borders = find_for_gatherer_borders(s, i);
 
 						std::vector <std::string> temp(borders.first, borders.second);
 						temp_array = &vector_to_object(temp);
