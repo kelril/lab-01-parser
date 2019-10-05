@@ -17,12 +17,6 @@ bool Json::is_object() const
 		return contains_object;
 	}
 
-Json::~Json()
-	{
-		Objects.clear();
-		Arrays.clear();
-	}
-
 // Function check file existence
 bool is_file(const std::string& s)
 	{
@@ -153,6 +147,28 @@ void clear_begback_of_string(std::string & s)
 			}
 	}
 
+// Функция очистки вектора от ненужных символов в начале и конце
+void clear_begback_of_vector(std::vector<std::string> & s)
+	{
+		if (s.empty())
+			{
+				return;
+			}
+		auto search_front = unused_chars.find(s.front().front());
+		auto search_back = unused_chars.find(s.back().front());
+
+		while (search_front != unused_chars.end())
+			{
+				s.erase(s.begin());
+				search_front = unused_chars.find(s.front().front());
+			}
+		while (search_back != unused_chars.end())
+			{
+				s.pop_back();
+				search_back = unused_chars.find(s.back().front());
+			}
+	}
+
 void clear_pair(std::pair<std::string, std::string>& temp)
 	{
 		temp.first.clear(); temp.second.clear();
@@ -280,6 +296,7 @@ std::pair <size_t, size_t> find_segment_borders(std::string s, size_t index)
 		size_t temp = index;
 		size_t last = s.find_first_of(reverse_char, index);
 
+		// Смысл этого цикла: мы находим новую дальнюю границу ('}' или ']'), пока находим внутри новую нижнюю границу ('{' или '[')
 		while (s.find_first_of(my_char, temp) < s.find_first_of(my_char, temp + 1) && s.find_first_of(my_char, temp + 1) < s.find_first_of(reverse_char, last))
 			{
 				temp = s.find_first_of(my_char, temp + 1);			// <- Это мы находим сколько вложенных
@@ -580,9 +597,36 @@ std::vector <std::string> array_parser(std::string& s)
 ///			Вспомогательные функции для сборки объектов
 Json& vector_to_object(std::vector <std::string>& s);
 
+std::pair <std::vector<std::string>::iterator, std::vector<std::string>::iterator> find_for_gatherer_borders(std::vector <std::string>& s, size_t index)
+	{
+		std::string my_char = s.at(index);
+		std::string  reverse_char;
+		
+		if (my_char == "{" - '\0')
+			{
+				reverse_char = "}"-'\0';
+			}
+		else if (my_char == "[" - '\0')
+			{
+				reverse_char = "]" - '\0';
+			}
+
+		auto temp = s.begin() + index;
+		auto last = std::find(std::begin(s)+index, std::end(s), reverse_char);
+
+		// Смысл этого цикла: мы находим новую дальнюю границу ('}' или ']'), пока находим внутри новую нижнюю границу ('{' или '[')
+		while (std::find(temp, std::end(s), my_char) < std::find(temp + 1, std::end(s), my_char) && std::find(temp + 1, std::end(s), my_char) < std::find(last, std::end(s), reverse_char))
+			{
+				temp = std::find(temp + 1, std::end(s), my_char);			// <- Это мы находим сколько вложенных
+				last = std::find(last+1, std::end(s), reverse_char);		// <- Это мы находим следущую закрывающую скобку
+			}	
+		return std::make_pair(s.begin() + index,last+1);
+	}
+
 void object_gatherer(std::vector <std::string>& s, Json *j)
 	{
 		std::pair <std::string, std::any> temp_object;
+		std::pair <std::vector<std::string>::iterator, std::vector<std::string>::iterator> borders;
 		const size_t start_point = -1;
 
 		j->contains_object = true;
@@ -594,33 +638,17 @@ void object_gatherer(std::vector <std::string>& s, Json *j)
 					{
 						temp_object.first = s.at(i - 1);
 						if (s.at(i + 1) == "{" || s.at(i + 1) == "[")
-							{
-								auto k = s .begin() + i + 1;
-								int kol = 0;
-								std::vector <std::string> temp;
-								do
-									{
-										temp.push_back(*k);
-										if (k->compare("{") == 0 ||k->compare("[") == 0)
-											{
-												kol++;
-											}
-										if (k->compare("}") == 0 || k->compare("]") == 0)
-											{
-												kol--;
-											}
-										k++;
-									} while (kol != 0 && k+1!=s.end());
+							{							
+								borders = find_for_gatherer_borders(s, i + 1);
+								std::vector <std::string> temp(borders.first,borders.second);
 
 								temp_object.second = &vector_to_object(temp);
 
 								j->AddObject(temp_object.first, temp_object.second);
 
-								s.erase(s.begin(), k);
-								while (!s.empty() && (s.front().compare(",") == 0 || s.front().compare(" ") == 0))
-									{
-										s.erase(s.begin());
-									}
+								s.erase(s.begin(), borders.second);
+								clear_begback_of_vector(s);
+
 								i = start_point;
 								continue;
 							}
@@ -641,6 +669,7 @@ void object_gatherer(std::vector <std::string>& s, Json *j)
 void array_gatherer(std::vector <std::string>& s, Json *j)
 	{
 		std::any temp_array;
+		std::pair <std::vector<std::string>::iterator, std::vector<std::string>::iterator> borders;
 		const size_t start_point = -1;
 
 		j->contains_array = true;
@@ -649,30 +678,15 @@ void array_gatherer(std::vector <std::string>& s, Json *j)
 			{
 				if (s.at(i) == "{" || s.at(i) == "[")
 					{
-						auto k = s.begin() + i + 1;
-						int kol = 0;
-						std::vector <std::string> temp;
-						do
-							{
-								temp.push_back(*k);
-								if (k->compare("{") == 0 || k->compare("[") == 0)
-									{
-										kol++;
-									}
-								if (k->compare("}") == 0 || k->compare("]") == 0)
-									{
-										kol--;
-									}
-								k++;
-							} while (kol != 0 && k + 1 != s.end());
+						borders = find_for_gatherer_borders(s, i + 1);
+
+						std::vector <std::string> temp(borders.first, borders.second);
 						temp_array = &vector_to_object(temp);
 						j->AddArray(temp_array);
 
-						s.erase(s.begin(), k);
-						while (!s.empty() && (s.front().compare(",") == 0 || s.front().compare(" ") == 0))
-							{
-								s.erase(s.begin());
-							}
+						s.erase(s.begin(), borders.second);
+						clear_begback_of_vector(s);
+
 						i = start_point;
 						continue;
 					}
