@@ -12,6 +12,7 @@
 
 #include <any>
 #include <typeinfo>
+#include <algorithm>
 
 std::vector <std::string> array_parser(std::string& s);
 std::vector <std::string> object_parser(std::string& s);
@@ -34,7 +35,7 @@ class Json
 		// Пустой конструктор
 		Json() = default;
 		
-		virtual ~Json();
+		~Json() = default;
 
 		// Метод возвращает true, если данный экземпляр содержит в себе JSON-массив. Иначе false.
 		bool is_array() const;
