@@ -28,15 +28,6 @@ TEST(Json, ExampleJson)
 		EXPECT_EQ(std::any_cast<std::string>(address["street"]), "Vozdvijenka");
 	}
 
-TEST(Json, ParseFile)
-	{
-		Json json("../tests/TestJson.json");
-
-		EXPECT_EQ(json.is_object(), true);
-		EXPECT_EQ(json.is_array(), false);
-		EXPECT_EQ(json.is_empty(), false);
-	}
-
 TEST(Json, ParseFileException)
 	{
 		EXPECT_THROW(
