@@ -2,6 +2,7 @@
 
 const std::set <char> unused_chars {' ','\n','\t',','};
 const std::set <char> edge_chars {',',']','}',':'};
+const std::set <char> borders_chars{']','}'};
 
 bool Json::is_empty() const
 	{
@@ -178,48 +179,28 @@ void clear_pair(std::pair<std::string, std::string>& temp)
 std::pair<std::string, std::string> objfound_colon(std::string& s, std::pair <std::string, std::string>& temp_pair, size_t i)
 	{
 		// i - это позиция ':'
-		std::pair <std::string, std::string> keyval;
-		size_t j = i;
-
-		while (j<s.size() && (edge_chars.find(s.at(j)) == edge_chars.end()))
-			{
-				j++;
-			}
 		// j на выходе - это позиция знаков-границ (',',']','}') или конца строки
 		// Наглядно: 
 		//       i     j
 		// "..." : ... , ....
 		// value будет располагаться в отрезке [i+1,j-1], длина этого отрезка j-1-(i+1) + 1 = j-i-1
-		keyval.second = s.substr(i + 1, j - i - 1);
+		temp_pair.second = s.substr(i+1, std::find_first_of(s.begin() + i + 1, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
 
 		clear_begback_of_string(temp_pair.first);
 		clear_begback_of_string(temp_pair.second);
 		clear_quotes(temp_pair.first);
 		clear_quotes(temp_pair.second);
 
-		s.erase(0, j+1);
+		s.erase(s.begin(), std::find_first_of(s.begin() + i + 1, s.end(), edge_chars.begin(), edge_chars.end()));
 
-		return keyval;
+		return temp_pair;
 	}	
 
-std::pair<std::string, std::string> objfound_quote(std::string& s, std::vector <std::string>& vec, std::pair <std::string, std::string>& temp_pair, size_t i)
+void objfound_quote(std::string& s, std::vector <std::string>& vec, std::pair <std::string, std::string>& temp_pair, size_t i)
 	{
-		size_t j = i;
-
-		while (j < s.size() && (edge_chars.find(s.at(j)) == edge_chars.end()))
-			{
-				j++;
-			}
 		if (temp_pair.second.empty() && !temp_pair.first.empty())
 			{
-				if (j + 1 == s.size())
-					{
-						temp_pair.second = s.substr(i, j - i + 1);
-					}
-				else
-					{
-						temp_pair.second = s.substr(i, j - i);
-					}
+				temp_pair.second = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
 
 				clear_begback_of_string(temp_pair.first);
 				clear_begback_of_string(temp_pair.second);
@@ -230,38 +211,29 @@ std::pair<std::string, std::string> objfound_quote(std::string& s, std::vector <
 				vec.insert(vec.end() - 1, ":");
 				vec.insert(vec.end() - 1, temp_pair.second);
 
-				s.erase(0, j + 1);
-
+				s.erase(s.begin(), std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()));
 				clear_pair(temp_pair);
-				return temp_pair;
 			}
-		if (temp_pair.first.empty())
+		else if (temp_pair.first.empty())
 			{
-				temp_pair.first = s.substr(i, j - i - 1);
+				temp_pair.first = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
 				clear_begback_of_string(temp_pair.first);
 				clear_quotes(temp_pair.first);
-				s.erase(0, j + 1);
-				i = -1;
+				s.erase(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin() + 1);
 			}
-		return temp_pair;
 	}
 
 void objfound_comma(std::string& s, std::vector <std::string>& vec, std::pair <std::string, std::string>& temp_pair, size_t& i)
 	{
-		size_t j = i;
 		const size_t start_point = -1;
 
-		while (j != 0 && s.at(j) != ':')
-			{
-				j--;
-			}
 		if (temp_pair.first.empty())
 			{
 				throw JsonWarning("Something wrong in json string!");
 			}
 		if (temp_pair.second.empty() && !temp_pair.first.empty())
 			{
-				temp_pair.second = s.substr(j, i - j);
+				temp_pair.second = s.substr(0, i);
 
 				clear_begback_of_string(temp_pair.first);
 				clear_begback_of_string(temp_pair.second);
@@ -274,7 +246,7 @@ void objfound_comma(std::string& s, std::vector <std::string>& vec, std::pair <s
 
 				clear_pair(temp_pair);
 
-				s.erase(0, i + 1);
+				s.erase(s.begin(), std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()));
 				i = start_point;
 			}
 	}
@@ -400,7 +372,7 @@ std::vector <std::string> object_parser(std::string& s)
 					}
 				if (s.at(i) == '\"' || s.at(i) == '\'')
 					{
-						keyval = objfound_quote(s, string_objects, keyval, i);
+						objfound_quote(s, string_objects, keyval, i);
 						i = start_point;
 						continue;
 					}
@@ -447,26 +419,14 @@ std::vector <std::string> object_parser(std::string& s)
 void arrfound_quote(std::string&s, std::vector <std::string>& vec, size_t i)
 	{
 		std::string value;
-		size_t j = i;
 
-		while (j < s.size() && (edge_chars.find(s.at(j)) == edge_chars.end()))
-			{
-				j++;
-			}
-		if (j + 1 == s.size())
-			{
-				value = s.substr(i, j - i + 1);
-			}
-		else
-			{
-				value = s.substr(i, j - i);
-			}
+		value = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end())-s.begin());
 		clear_begback_of_string(value);
 		clear_quotes(value);
 		vec.insert(vec.end() - 1, value);
 		value.clear();
 
-		s.erase(0, j + 1);
+		s.erase(0, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
 		clear_begback_of_string(s);
 	}
 
