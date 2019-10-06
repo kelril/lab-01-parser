@@ -20,7 +20,7 @@ bool Json::is_object() const
 // Function check file existence
 bool is_file(const std::string& s)
 	{
-		bool buffer=false;			// Создаём левую переменную, чтобы конечное значение не исчезло
+		bool buffer = false;		// Создаём левую переменную, чтобы конечное значение не исчезло
 		std::ifstream check(s);		// Открываем файл с названием s
 		buffer = check.is_open();	// Присваиваем значение
 		check.close();				// Закрываем файл
@@ -120,9 +120,9 @@ void clear_quotes(std::string & s)
 				s.erase(s.begin());
 			}
 		if (s.back() == '\"' || s.back() == '\'')
-		{
-			s.pop_back();
-		}
+			{
+				s.pop_back();
+			}
 	}
 
 // Функция очистки строки от ненужных символов в начале и конце
@@ -183,14 +183,14 @@ std::pair<std::string, std::string> objfound_colon(std::string& s, std::pair <st
 		//       i     j
 		// "..." : ... , ....
 		// value будет располагаться в отрезке [i+1,j-1], длина этого отрезка j-1-(i+1) + 1 = j-i-1
-		temp_pair.second = s.substr(i+1, std::find_first_of(s.begin() + i + 1, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
+		temp_pair.second = s.substr(i+1, std::find_first_of(s.begin() + i + 1, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin() - 1);
 
 		clear_begback_of_string(temp_pair.first);
 		clear_begback_of_string(temp_pair.second);
 		clear_quotes(temp_pair.first);
 		clear_quotes(temp_pair.second);
 
-		s.erase(s.begin(), std::find_first_of(s.begin() + i + 1, s.end(), edge_chars.begin(), edge_chars.end()));
+		s.erase(s.begin(), std::find_first_of(s.begin() + i + 1, s.end(), edge_chars.begin(), edge_chars.end()) + 1);
 
 		return temp_pair;
 	}	
@@ -199,7 +199,7 @@ void objfound_quote(std::string& s, std::vector <std::string>& vec, std::pair <s
 	{
 		if (temp_pair.second.empty() && !temp_pair.first.empty())
 			{
-				temp_pair.second = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
+				temp_pair.second = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin() - 1);
 
 				clear_begback_of_string(temp_pair.first);
 				clear_begback_of_string(temp_pair.second);
@@ -245,7 +245,7 @@ void objfound_comma(std::string& s, std::vector <std::string>& vec, std::pair <s
 
 				clear_pair(temp_pair);
 
-				s.erase(s.begin(), std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()));
+				s.erase(s.begin(), std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) + 1);
 				i = start_point;
 			}
 	}
@@ -419,13 +419,13 @@ void arrfound_quote(std::string&s, std::vector <std::string>& vec, size_t i)
 	{
 		std::string value;
 
-		value = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end())-s.begin());
+		value = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end())-s.begin() - 1);
 		clear_begback_of_string(value);
 		clear_quotes(value);
 		vec.insert(vec.end() - 1, value);
 		value.clear();
 
-		s.erase(0, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
+		s.erase(0, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin() + 1);
 		clear_begback_of_string(s);
 	}
 
@@ -521,10 +521,7 @@ std::vector <std::string> array_parser(std::string& s)
 			}
 		if (!s.empty())
 			{
-				while (s.find(' ') !=std::string::npos)
-					{
-						s.erase(s.begin()+s.find_first_of(' '));
-					}
+				clear_begback_of_string(s);
 				string_array.insert(string_array.end() - 1, s);
 			}
 		return string_array;
