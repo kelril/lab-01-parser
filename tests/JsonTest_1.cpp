@@ -29,7 +29,7 @@ TEST(Json, ExampleJson)
 	}
 TEST(Json, ParseFile)
 	{
-	    auto json = Json::parseFile("../tests/TestData.json");
+	    Json json("../tests/TestData.json");
 	
 	    EXPECT_EQ(json.is_object(), true);
 	    EXPECT_EQ(json.is_array(), false);
