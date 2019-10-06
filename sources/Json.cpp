@@ -1,5 +1,7 @@
 #include  "Json.hpp"
 
+#include <filesystem>
+
 const std::set <char> unused_chars {' ','\n','\t',','};
 const std::set <char> edge_chars {',',']','}',':'};
 const std::set <char> borders_chars{']','}'};
@@ -22,10 +24,8 @@ bool Json::is_object() const
 bool is_file(const std::string& s)
 	{
 		bool buffer=false;			// Создаём левую переменную, чтобы конечное значение не исчезло
-		std::ifstream check(s);		// Открываем файл с названием s
-		buffer = check.is_open();	// Присваиваем значение
-		check.close();				// Закрываем файл
-		return buffer;				// Выводим значение
+		buffer = std::filesystem::exists(s);
+		return buffer;				// Выводим значение	
 	}
 
 Json::Json(const std::string& s)
@@ -672,6 +672,7 @@ Json& vector_to_object(std::vector <std::string>& s)
 		///
 
 		buffer = s;
+		clear_begback_of_string(buffer);
 		if (s.front() == '{' && s.back() == '}')
 			{
 				big_string_vector = object_parser(buffer);
