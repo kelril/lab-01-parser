@@ -4,7 +4,6 @@
 
 const std::set <char> unused_chars {' ','\n','\t',','};
 const std::set <char> edge_chars {',',']','}',':'};
-const std::set <char> borders_chars{']','}'};
 
 bool Json::is_empty() const
 	{
@@ -24,7 +23,15 @@ bool Json::is_object() const
 bool is_file(const std::string& s)
 	{
 		bool buffer=false;			// Создаём левую переменную, чтобы конечное значение не исчезло
-		buffer = std::filesystem::exists(s);
+		try
+			{
+				buffer = std::filesystem::exists(s);
+			}
+		catch (std::exception &exc)
+			{
+				return false;
+			}
+		
 		return buffer;				// Выводим значение	
 	}
 
@@ -216,7 +223,7 @@ void objfound_quote(std::string& s, std::vector <std::string>& vec, std::pair <s
 			}
 		else if (temp_pair.first.empty())
 			{
-				temp_pair.first = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin());
+				temp_pair.first = s.substr(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin() - 1);
 				clear_begback_of_string(temp_pair.first);
 				clear_quotes(temp_pair.first);
 				s.erase(i, std::find_first_of(s.begin() + i, s.end(), edge_chars.begin(), edge_chars.end()) - s.begin() + 1);
