@@ -291,7 +291,7 @@ void objfound_begin_of_anobj(std::string& s, std::vector <std::string>& vec, std
 			{
 				borders = find_segment_borders(s, i);
 				sub_string = s.substr(borders.first, borders.second - borders.first);
-				s.erase(borders.first, borders.second - borders.first);
+				s.erase(borders.first, borders.second - borders.first + 1);
 				clear_begback_of_string(s);
 
 				nested.push_back(object_parser(sub_string));
@@ -324,7 +324,7 @@ void objfound_begin_of_anarr(std::string&s, std::vector <std::string>& vec, std:
 			{
 				borders = find_segment_borders(s, i);
 				sub_string = s.substr(borders.first, borders.second - borders.first);
-				s.erase(borders.first, borders.second - borders.first);
+				s.erase(borders.first, borders.second - borders.first + 1);
 				clear_begback_of_string(s);
 
 				nested.push_back(array_parser(sub_string));
