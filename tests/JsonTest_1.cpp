@@ -33,7 +33,7 @@ TEST(Json, ParseFile)
 	
 	    EXPECT_EQ(json.is_object(), true);
 	    EXPECT_EQ(json.is_array(), false);
-	    EXPECT_EQ(json.is_null(), false);
+	    EXPECT_EQ(json.is_empty(), false);
 	}
 
 TEST(Json, ParseFileException)
