@@ -3,13 +3,7 @@
 
 #include "Json.hpp"
 
-TEST(Json, NullJson)
-	{
-		Json json{};
-		EXPECT_EQ(json.is_object(), false);
-		EXPECT_EQ(json.is_array(), false);
-		EXPECT_EQ(json.is_empty(), true);
-	}
+
 
 TEST(Json, ExampleJson)
 	{
